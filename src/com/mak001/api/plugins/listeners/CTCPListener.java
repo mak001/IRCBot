@@ -1,4 +1,4 @@
-package com.mak001.ircBot.plugins.listeners;
+package com.mak001.api.plugins.listeners;
 
 /**
  * Listens for CTCP requests

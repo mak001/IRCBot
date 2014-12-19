@@ -1,4 +1,4 @@
-package com.mak001.ircBot.plugins.defaults.compiler;
+package com.mak001.ircBot.plugins.compiler;
 
 import java.io.BufferedReader;
 import java.io.File;

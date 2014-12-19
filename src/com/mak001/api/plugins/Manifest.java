@@ -1,4 +1,4 @@
-package com.mak001.ircBot.plugins;
+package com.mak001.api.plugins;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

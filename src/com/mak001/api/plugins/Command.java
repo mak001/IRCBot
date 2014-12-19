@@ -1,6 +1,6 @@
-package com.mak001.ircBot.plugins;
+package com.mak001.api.plugins;
 
-import com.mak001.ircBot.plugins.defaults.permissions.IRCPermissions;
+import com.mak001.ircBot.plugins.permissions.IRCPermissions;
 
 
 public class Command {

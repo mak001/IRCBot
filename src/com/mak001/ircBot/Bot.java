@@ -4,21 +4,21 @@ import java.util.ArrayList;
 
 import org.jibble.pircbot.PircBot;
 
-import com.mak001.ircBot.plugins.Command;
-import com.mak001.ircBot.plugins.Plugin;
-import com.mak001.ircBot.plugins.defaults.Permissions;
-import com.mak001.ircBot.plugins.defaults.RegularCommands;
-import com.mak001.ircBot.plugins.defaults.permissions.IRCPermissions;
-import com.mak001.ircBot.plugins.listeners.ActionListener;
-import com.mak001.ircBot.plugins.listeners.CTCPListener;
-import com.mak001.ircBot.plugins.listeners.JoinListener;
-import com.mak001.ircBot.plugins.listeners.MessageListener;
-import com.mak001.ircBot.plugins.listeners.ModeListener;
-import com.mak001.ircBot.plugins.listeners.NickChangeListener;
-import com.mak001.ircBot.plugins.listeners.NoticeListener;
-import com.mak001.ircBot.plugins.listeners.PartListener;
-import com.mak001.ircBot.plugins.listeners.PrivateMessageListener;
-import com.mak001.ircBot.plugins.listeners.QuitListener;
+import com.mak001.api.plugins.Command;
+import com.mak001.ircBot.plugins.Permissions;
+import com.mak001.api.plugins.Plugin;
+import com.mak001.ircBot.plugins.RegularCommands;
+import com.mak001.ircBot.plugins.permissions.IRCPermissions;
+import com.mak001.api.plugins.listeners.ActionListener;
+import com.mak001.api.plugins.listeners.CTCPListener;
+import com.mak001.api.plugins.listeners.JoinListener;
+import com.mak001.api.plugins.listeners.MessageListener;
+import com.mak001.api.plugins.listeners.ModeListener;
+import com.mak001.api.plugins.listeners.NickChangeListener;
+import com.mak001.api.plugins.listeners.NoticeListener;
+import com.mak001.api.plugins.listeners.PartListener;
+import com.mak001.api.plugins.listeners.PrivateMessageListener;
+import com.mak001.api.plugins.listeners.QuitListener;
 import com.mak001.ircBot.settings.Settings;
 import com.mak001.ircBot.settings.SettingsWriter;
 

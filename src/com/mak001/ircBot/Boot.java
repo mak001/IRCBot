@@ -17,8 +17,8 @@ import java.util.jar.JarFile;
 
 import com.mak001.ircBot.gui.GUI;
 import com.mak001.ircBot.gui.simple.SimpleGUI;
-import com.mak001.ircBot.plugins.Plugin;
-import com.mak001.ircBot.plugins.defaults.permissions.IRCPermissions;
+import com.mak001.api.plugins.Plugin;
+import com.mak001.ircBot.plugins.permissions.IRCPermissions;
 import com.mak001.ircBot.settings.Settings;
 import com.mak001.ircBot.settings.SettingsWriter;
 

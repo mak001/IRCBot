@@ -1,15 +1,15 @@
-package com.mak001.ircBot.plugins.defaults;
+package com.mak001.ircBot.plugins;
 
 import org.jibble.pircbot.PircBot;
 
 import com.mak001.ircBot.Bot;
-import com.mak001.ircBot.plugins.Command;
-import com.mak001.ircBot.plugins.Command.CommandAction;
-import com.mak001.ircBot.plugins.Manifest;
-import com.mak001.ircBot.plugins.Plugin;
-import com.mak001.ircBot.plugins.defaults.compiler.MyCompiler;
-import com.mak001.ircBot.plugins.defaults.compiler.ReadFile;
-import com.mak001.ircBot.plugins.defaults.permissions.IRCPermissions;
+import com.mak001.api.plugins.Command;
+import com.mak001.api.plugins.Command.CommandAction;
+import com.mak001.api.plugins.Manifest;
+import com.mak001.api.plugins.Plugin;
+import com.mak001.ircBot.plugins.compiler.MyCompiler;
+import com.mak001.ircBot.plugins.compiler.ReadFile;
+import com.mak001.ircBot.plugins.permissions.IRCPermissions;
 import com.mak001.ircBot.settings.Settings;
 
 @Manifest(authors = { "mak001" }, name = "Default commands", version = 1.0, description = "The default commands that came with the bot (not including the permission commands)")

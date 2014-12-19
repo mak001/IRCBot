@@ -1,4 +1,4 @@
-package com.mak001.ircBot.plugins.defaults.permissions;
+package com.mak001.ircBot.plugins.permissions;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-import com.mak001.ircBot.methods.OrganizedMap;
+import com.mak001.api.OrganizedMap;
 import com.mak001.ircBot.settings.Settings;
 
 public class IRCPermissions {

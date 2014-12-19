@@ -1,4 +1,4 @@
-package com.mak001.ircBot.plugins.defaults.compiler;
+package com.mak001.ircBot.plugins.compiler;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -8,7 +8,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 
 import com.mak001.ircBot.Bot;
-import com.mak001.ircBot.methods.StringMethods;
+import com.mak001.api.StringMethods;
 import com.mak001.ircBot.settings.Settings;
 
 public class ReadFile {

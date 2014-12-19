@@ -6,7 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import com.mak001.ircBot.gui.SetUp;
-import com.mak001.ircBot.plugins.defaults.permissions.IRCPermissions;
+import com.mak001.ircBot.plugins.permissions.IRCPermissions;
 
 
 public class SettingsWriter {
@@ -19,14 +19,12 @@ public class SettingsWriter {
 			file.mkdirs();
 		}
 
-		if (!(file = new File(Settings.userHome + Settings.fileSeparator
-				+ "Settings")).exists()) {
+		if (!(file = new File(Settings.userHome + Settings.fileSeparator + "Settings")).exists()) {
 			file.mkdirs();
 		}
 
-		if (!(file = new File(Settings.userHome + Settings.fileSeparator
-				+ "Settings" + Settings.fileSeparator + "Settings.txt"))
-				.exists()) {
+		if (!(file = new File(Settings.userHome + Settings.fileSeparator + "Settings" + Settings.fileSeparator
+				+ "Settings.txt")).exists()) {
 
 			new Thread(new Runnable() {
 
@@ -41,56 +39,47 @@ public class SettingsWriter {
 							e.printStackTrace();
 						}
 					}
-					Settings.put(Settings.SERVER,
-							setUp.getJTextFields()[0].getText());
+					Settings.put(Settings.SERVER, setUp.getJTextFields()[0].getText());
 
-					Settings.getChannels().add(
-							setUp.getJTextFields()[1].getText());
-					Settings.put(Settings.NICK,
-							setUp.getJTextFields()[2].getText());
-					Settings.put(Settings.NICK_PASS,
-							setUp.getJTextFields()[3].getText());
-					Settings.put(Settings.COMMAND_PREFIX,
-							setUp.getJTextFields()[4].getText());
+					Settings.getChannels().add(setUp.getJTextFields()[1].getText());
+					Settings.put(Settings.NICK, setUp.getJTextFields()[2].getText());
+					Settings.put(Settings.NICK_PASS, setUp.getJTextFields()[3].getText());
+					Settings.put(Settings.COMMAND_PREFIX, setUp.getJTextFields()[4].getText());
 					setUp.dispose();
 				}
 			}).run();
 
 			update();
 		}
-		if (!(file = new File(Settings.userHome + Settings.fileSeparator
-				+ "Settings" + Settings.fileSeparator + "groups.mak")).exists()) {
+		if (!(file = new File(Settings.userHome + Settings.fileSeparator + "Settings" + Settings.fileSeparator
+				+ "groups.mak")).exists()) {
 			IRCPermissions.setUpGroups();
 
 		}
-		if (!(file = new File(Settings.userHome + Settings.fileSeparator
-				+ "Settings" + Settings.fileSeparator + "users.mak")).exists()) {
+		if (!(file = new File(Settings.userHome + Settings.fileSeparator + "Settings" + Settings.fileSeparator
+				+ "users.mak")).exists()) {
 			IRCPermissions.setUpUsers();
 		}
 
-		if (!(file = new File(Settings.userHome + Settings.fileSeparator
-				+ "Plugins")).exists()) {
+		if (!(file = new File(Settings.userHome + Settings.fileSeparator + "Plugins")).exists()) {
 			file.mkdirs();
 		}
 
-		if (!(file = new File(Settings.userHome + Settings.fileSeparator
-				+ "Plugins" + Settings.fileSeparator + "bin")).exists()) {
+		if (!(file = new File(Settings.userHome + Settings.fileSeparator + "Plugins" + Settings.fileSeparator + "bin"))
+				.exists()) {
 			file.mkdirs();
 		}
 
-		if (!(file = new File(Settings.userHome + Settings.fileSeparator
-				+ "Resources")).exists()) {
+		if (!(file = new File(Settings.userHome + Settings.fileSeparator + "Resources")).exists()) {
 			file.mkdirs();
 		}
 
-		if (!(file = new File(Settings.userHome + Settings.fileSeparator
-				+ "run.bat")).exists()) {
+		if (!(file = new File(Settings.userHome + Settings.fileSeparator + "run.bat")).exists()) {
 			writeRun();
 		}
 
-		if (!(file = new File(Settings.userHome + Settings.fileSeparator
-				+ "Resources" + Settings.fileSeparator + "FindJDK.bat"))
-				.exists()) {
+		if (!(file = new File(Settings.userHome + Settings.fileSeparator + "Resources" + Settings.fileSeparator
+				+ "FindJDK.bat")).exists()) {
 			writeJDK();
 		}
 
@@ -100,8 +89,8 @@ public class SettingsWriter {
 	private static void writeRun() {
 		try {
 			String n = Settings.lineSeparator;
-			writer = new BufferedWriter(new FileWriter(new File(
-					Settings.userHome + Settings.fileSeparator + "run.bat")));
+			writer = new BufferedWriter(
+					new FileWriter(new File(Settings.userHome + Settings.fileSeparator + "run.bat")));
 
 			writer.write("@echo off" + n);
 			writer.write("title IRCBot" + n);
@@ -126,15 +115,13 @@ public class SettingsWriter {
 	private static void writeJDK() {
 		try {
 			String n = Settings.lineSeparator;
-			writer = new BufferedWriter(new FileWriter(new File(
-					Settings.userHome + Settings.fileSeparator + "Resources"
-							+ Settings.fileSeparator + "FindJDK.bat")));
+			writer = new BufferedWriter(new FileWriter(new File(Settings.userHome + Settings.fileSeparator
+					+ "Resources" + Settings.fileSeparator + "FindJDK.bat")));
 			writer.write("@ECHO OFF" + n);
 
 			writer.write("ECHO Looking for JDK" + n);
 
-			writer.write("SET KEY_NAME=HKLM\\SOFTWARE\\JavaSoft\\Java Development Kit"
-					+ n);
+			writer.write("SET KEY_NAME=HKLM\\SOFTWARE\\JavaSoft\\Java Development Kit" + n);
 			writer.write("FOR /F \"tokens=3\" %%A IN ('REG QUERY \"%KEY_NAME%\" /v CurrentVersion 2^>NUL') DO SET jdkv=%%A"
 					+ n);
 			writer.write("SET jdk=" + n);
@@ -143,8 +130,7 @@ public class SettingsWriter {
 			writer.write("FOR /F \"skip=2 tokens=3,4\" %%A IN ('REG QUERY \"%KEY_NAME%\\%jdkv%\" /v JavaHome 2^>NUL') DO SET jdk=%%A %%B"
 					+ n);
 			writer.write(") ELSE (" + n);
-			writer.write("	FOR /F \"tokens=*\" %%G IN ('DIR /B \"%ProgramFiles%\\Java\\jdk*\"') DO SET jdk=%%G"
-					+ n);
+			writer.write("	FOR /F \"tokens=*\" %%G IN ('DIR /B \"%ProgramFiles%\\Java\\jdk*\"') DO SET jdk=%%G" + n);
 			writer.write(")" + n);
 
 			writer.write("SET jdk=%jdk%\\bin" + n);
@@ -159,8 +145,7 @@ public class SettingsWriter {
 			writer.write("GOTO :eof" + n);
 
 			writer.write(":notfound" + n);
-			writer.write("ECHO JDK is not installed, please download and install it from:"
-					+ n);
+			writer.write("ECHO JDK is not installed, please download and install it from:" + n);
 			writer.write("ECHO http://java.sun.com/javase/downloads" + n);
 			writer.write("ECHO." + n);
 			writer.write("PAUSE" + n);
@@ -179,21 +164,18 @@ public class SettingsWriter {
 
 	public static void update() {
 		try {
-			writer = new BufferedWriter(new FileWriter(new File(
-					Settings.userHome + Settings.fileSeparator + "Settings"
-							+ Settings.fileSeparator + "Settings.txt")));
+			writer = new BufferedWriter(new FileWriter(new File(Settings.userHome + Settings.fileSeparator + "Settings"
+					+ Settings.fileSeparator + "Settings.txt")));
 
 			for (String key : Settings.getSettings().keySet()) {
-				writer.write(key + "=" + Settings.get(key)
-						+ Settings.lineSeparator);
+				writer.write(key + "=" + Settings.get(key) + Settings.lineSeparator);
 			}
 
 			String chanOut = "";
 			for (String chan : Settings.getChannels()) {
 				chanOut = (chanOut.equals("") ? "" : chanOut + ", ") + chan;
 			}
-			writer.write(Settings.CHANNELS + "=" + chanOut
-					+ Settings.lineSeparator);
+			writer.write(Settings.CHANNELS + "=" + chanOut + Settings.lineSeparator);
 			writer.close();
 
 		} catch (IOException e) {

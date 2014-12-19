@@ -1,14 +1,14 @@
-package com.mak001.ircBot.plugins.defaults;
+package com.mak001.ircBot.plugins;
 
 import java.util.ArrayList;
 
 import com.mak001.ircBot.Bot;
-import com.mak001.ircBot.plugins.Command;
-import com.mak001.ircBot.plugins.Command.CommandAction;
-import com.mak001.ircBot.plugins.Manifest;
-import com.mak001.ircBot.plugins.Plugin;
-import com.mak001.ircBot.plugins.defaults.permissions.IRCPermissions;
-import com.mak001.ircBot.plugins.defaults.permissions.User;
+import com.mak001.api.plugins.Command;
+import com.mak001.api.plugins.Command.CommandAction;
+import com.mak001.api.plugins.Manifest;
+import com.mak001.api.plugins.Plugin;
+import com.mak001.ircBot.plugins.permissions.IRCPermissions;
+import com.mak001.ircBot.plugins.permissions.User;
 import com.mak001.ircBot.settings.Settings;
 
 @Manifest(authors = { "mak001" }, name = "Permissions", version = 1.0, description = "Manage what people can and cannot use, you can also have exceptions.")

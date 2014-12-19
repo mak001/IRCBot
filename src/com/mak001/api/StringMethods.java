@@ -1,4 +1,4 @@
-package com.mak001.ircBot.methods;
+package com.mak001.api;
 
 public class StringMethods {
 
