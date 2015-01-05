@@ -28,6 +28,7 @@ public class RegularCommands extends Plugin {
 		bot.registerCommand(part);
 		bot.registerCommand(nick);
 		bot.registerCommand(set);
+		bot.registerCommand(broadcast);
 		bot.registerCommand(add_plugin);
 		bot.registerCommand(load_plugin);
 		bot.registerCommand(reload_plugin);
@@ -204,6 +205,21 @@ public class RegularCommands extends Plugin {
 			bot.sendMessage(sender, "Changes the bot's default nick to use : Syntax: " + prefix + "SET NICK <NEW_NICK>");
 			bot.sendMessage(sender, "Changes the bot's default command <PREFIX> (what commands start with)  : Syntax: "
 					+ prefix + "SET COMMAND_PREFIX <PREFIX>");
+		}
+	});
+
+	private Command broadcast = new Command(this, "BROADCAST", admin, new CommandAction() {
+
+		@Override
+		public void onCommand(String channel, String sender, String login, String hostname, String additional) {
+			for (String chan : bot.getChannels()) {
+				bot.sendMessage(chan, additional);
+			}
+		}
+
+		@Override
+		public void onHelp(String channel, String sender, String login, String hostname) {
+			bot.sendMessage(sender, "Broadcasts a specified sting in all joined channels");
 		}
 	});
 

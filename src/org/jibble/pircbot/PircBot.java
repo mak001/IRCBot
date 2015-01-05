@@ -87,7 +87,7 @@ public abstract class PircBot implements ReplyConstants {
 	 *             if our nick is already in use on the server.
 	 */
 	public final synchronized void connect(String hostname) throws IOException,
-			IrcException, NickAlreadyInUseException {
+			IrcException {
 		this.connect(hostname, 6667, null);
 	}
 
@@ -108,7 +108,7 @@ public abstract class PircBot implements ReplyConstants {
 	 *             if our nick is already in use on the server.
 	 */
 	public final synchronized void connect(String hostname, int port)
-			throws IOException, IrcException, NickAlreadyInUseException {
+			throws IOException, IrcException {
 		this.connect(hostname, port, null);
 	}
 
@@ -131,8 +131,7 @@ public abstract class PircBot implements ReplyConstants {
 	 *             if our nick is already in use on the server.
 	 */
 	public final synchronized void connect(String hostname, int port,
-			String password) throws IOException, IrcException,
-			NickAlreadyInUseException {
+			String password) throws IOException, IrcException {
 
 		_server = hostname;
 		_port = port;
@@ -257,7 +256,7 @@ public abstract class PircBot implements ReplyConstants {
 	 *             if our nick is already in use on the server.
 	 */
 	public final synchronized void reconnect() throws IOException,
-			IrcException, NickAlreadyInUseException {
+			IrcException {
 		if (getServer() == null) {
 			throw new IrcException(
 					"Cannot reconnect to an IRC server because we were never connected to one previously!");
@@ -2971,7 +2970,7 @@ public abstract class PircBot implements ReplyConstants {
 			return null;
 		}
 		// Clone the array to prevent external modification.
-		return (int[]) _dccPorts.clone();
+		return _dccPorts.clone();
 	}
 
 	/**
@@ -2994,7 +2993,7 @@ public abstract class PircBot implements ReplyConstants {
 			_dccPorts = null;
 		} else {
 			// Clone the array to prevent external modification.
-			_dccPorts = (int[]) ports.clone();
+			_dccPorts = ports.clone();
 		}
 	}
 
