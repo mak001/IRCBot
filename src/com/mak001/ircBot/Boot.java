@@ -224,7 +224,7 @@ public class Boot {
 		}
 	}
 
-	protected static void dispose() {
+	public static void dispose() {
 		if (gui != null) {
 			gui.dispose();
 		}

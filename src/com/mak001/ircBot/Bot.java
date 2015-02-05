@@ -434,4 +434,9 @@ public class Bot extends PircBot {
 	public ArrayList<Command> getCommands() {
 		return commands;
 	}
+
+	public ScheduledTaskHandler getTaskHandler() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

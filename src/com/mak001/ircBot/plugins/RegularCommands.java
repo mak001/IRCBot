@@ -2,14 +2,11 @@ package com.mak001.ircBot.plugins;
 
 import org.jibble.pircbot.PircBot;
 
-import com.mak001.ircBot.Bot;
 import com.mak001.api.plugins.Command;
 import com.mak001.api.plugins.Command.CommandAction;
 import com.mak001.api.plugins.Manifest;
 import com.mak001.api.plugins.Plugin;
-import com.mak001.ircBot.plugins.compiler.MyCompiler;
-import com.mak001.ircBot.plugins.compiler.ReadFile;
-import com.mak001.ircBot.plugins.permissions.IRCPermissions;
+import com.mak001.ircBot.Bot;
 import com.mak001.ircBot.settings.Settings;
 
 @Manifest(authors = { "mak001" }, name = "Default commands", version = 1.0, description = "The default commands that came with the bot (not including the permission commands)")
@@ -29,74 +26,12 @@ public class RegularCommands extends Plugin {
 		bot.registerCommand(nick);
 		bot.registerCommand(set);
 		bot.registerCommand(broadcast);
-		bot.registerCommand(add_plugin);
 		bot.registerCommand(load_plugin);
 		bot.registerCommand(reload_plugin);
 		bot.registerCommand(unload_plugin);
 		bot.registerCommand(shutdown);
 		bot.registerCommand(about);
 		bot.registerCommand(help);
-	}
-
-	public void sendHelp(String sender, String message) {
-
-		String[] s = message.split(" ");
-		String prefix = Settings.get(Settings.COMMAND_PREFIX);
-
-		if (IRCPermissions.hasPermission(sender, "main.admin")) {
-			if (message != null && !message.isEmpty()) {
-				if (s[0].equalsIgnoreCase("SAY")) {
-					bot.sendMessage(sender, "Send a message to the default channel : Syntax: " + prefix
-							+ "CMD SAY <stuff to say>");
-					bot.sendMessage(sender, "Send a message to a channel : Syntax: " + prefix
-							+ "CMD SAY #CHANNEL <stuff to say>");
-				} else if (s[0].equalsIgnoreCase("JOIN")) {
-					bot.sendMessage(sender, "Joins a channel : Syntax: " + prefix + "CMD JOIN <CHANNEL_NAME>");
-				} else if (s[0].equalsIgnoreCase("LEAVE")) {
-					bot.sendMessage(sender, "Leaves a channel : Syntax: " + prefix + "CMD LEAVE <CHANNEL_NAME>");
-				} else if (s[0].equalsIgnoreCase("PART")) {
-					bot.sendMessage(sender, "Leaves a channel : Syntax: " + prefix + "CMD PART <CHANNEL_NAME>");
-				} else if (s[0].equalsIgnoreCase("SET")) {
-					if (s[1].equalsIgnoreCase("NICK")) {
-						bot.sendMessage(sender, "Changes the bot's default nick to use : Syntax: " + prefix
-								+ "CMD SET NICK <NEW_NICK>");
-					} else if (s[1].equalsIgnoreCase("<PREFIX>")) {
-						bot.sendMessage(sender,
-								"Changes the bot's default command <PREFIX> (what commands start with)  : Syntax: "
-										+ prefix + "CMD SET COMMAND_PREFIX <PREFIX>");
-					}
-				}
-			} else if (s[0].equalsIgnoreCase("NICK")) {
-				bot.sendMessage(sender, "Changes the bot's current nick : Syntax: " + prefix + "CMD NICK <NEW_NICK>");
-			} else {
-				bot.sendMessage(sender, "Send a message to the default channel : Syntax: " + prefix
-						+ "CMD SAY <stuff to say>");
-				bot.sendMessage(sender, "Send a message to a channel : Syntax: " + prefix
-						+ "CMD SAY #CHANNEL <stuff to say>");
-				bot.sendMessage(sender, "Joins a channel : Syntax: " + prefix + "CMD JOIN <CHANNEL_NAME>");
-				bot.sendMessage(sender, "Leaves a channel : Syntax: " + prefix + "CMD LEAVE <CHANNEL_NAME>");
-				bot.sendMessage(sender, "Leaves a channel : Syntax: " + prefix + "CMD PART <CHANNEL_NAME>");
-				bot.sendMessage(sender,
-						"Changes the bot's default command <PREFIX> (what commands start with)  : Syntax: " + prefix
-								+ "CMD SET COMMAND_PREFIX <PREFIX>");
-				bot.sendMessage(sender, "Changes the bot's default nick to use : Syntax: " + prefix
-						+ "CMD SET NICK <NEW_NICK>");
-				bot.sendMessage(sender, "Changes the bot's current nick : Syntax: " + prefix + "CMD NICK <NEW_NICK>");
-			}
-		} else {
-			bot.sendMessage(sender, "You do not have access to admin commands.");
-		}
-		if (IRCPermissions.hasPermission(sender, "main.add")) {
-			bot.sendMessage(sender, "Adds new plugins : Syntax : " + prefix + "CMD ADD <SCRIPT_URL>");
-			bot.sendMessage(sender, "Currently supported sites: paste.strictfp.com | pastebin.com");
-			bot.sendMessage(sender, "If the script is local use : " + prefix + "CMD ADD LOCAL <FILE_NAME>");
-		} else {
-			bot.sendMessage(sender, "You do not have access to add plugins.");
-		}
-	}
-
-	private void addLocal(String sender, String fileName) {
-		MyCompiler.compile(bot, sender, fileName);
 	}
 
 	private boolean isChannel(String string) {
@@ -220,35 +155,6 @@ public class RegularCommands extends Plugin {
 		@Override
 		public void onHelp(String channel, String sender, String login, String hostname) {
 			bot.sendMessage(sender, "Broadcasts a specified sting in all joined channels");
-		}
-	});
-
-	private Command add_plugin = new Command(this, "ADD PLUGIN", plugins, new CommandAction() {
-
-		@Override
-		public void onCommand(String channel, String sender, String login, String hostname, String additional) {
-			if (additional.contains("strictfp")) {
-				if (additional.contains("/raw/")) {
-					ReadFile.addStrictFP(bot, sender, additional);
-				} else {
-					ReadFile.addStrictFP(bot, sender,
-							additional.replace("http://paste.strictfp.com/", "http://paste.strictfp.com/raw/"));
-				}
-			} else if (additional.contains("local")) {
-				addLocal(sender, additional.replace("local ", ""));
-			} else if (additional.contains("pastebin")) {
-				if (additional.contains("raw.php?i=")) {
-					ReadFile.addPasteBin(bot, sender, additional);
-				} else {
-					ReadFile.addPasteBin(bot, sender,
-							additional.replace("http://pastebin.com/", "http://pastebin.com/raw.php?i="));
-				}
-			}
-		}
-
-		@Override
-		public void onHelp(String channel, String sender, String login, String hostname) {
-			// TODO Auto-generated method stub
 		}
 	});
 
@@ -378,7 +284,7 @@ public class RegularCommands extends Plugin {
 		for (String author : pluginManifest.authors()) {
 			authors = authors + authors == "" ? "" : ", " + author;
 		}
-		return pluginManifest.name() + " by: " + authors + "   version: " + pluginManifest.version() + site
+		return pluginManifest.name() + " by: " + authors + "   version: " + pluginManifest.version() + " - " + site + " - "
 				+ description;
 	}
 }

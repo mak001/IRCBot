@@ -1,6 +1,6 @@
 package com.mak001.api.plugins.listeners;
 
-public interface ActionListener {
+public interface ActionListener extends Listener {
 
     /**
      * This method is called whenever an ACTION is sent from a user. E.g. such

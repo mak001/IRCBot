@@ -10,10 +10,23 @@ public class WebPage {
 
     private static BufferedReader br = null;
 
+    /**
+     * Downloads a page without redirecting it
+     * 
+     * @param link - The link to read
+     * @return - A downloaded page in String format
+     */
     public static String downloadPage(final String link) {
         return downloadPage(link, false);
     }
 
+    /**
+     * Downloads a page allowing the original page to redirect to another page
+     * 
+     * @param link - The link to read
+     * @param redirect - If we should follow redirects and download the page landed on by the redirect.
+     * @return - A downloaded page in String format
+     */
     public static String downloadPage(final String link, boolean redirect) {
         StringBuilder s = new StringBuilder();
         long timeOut = System.currentTimeMillis() + 1500;
