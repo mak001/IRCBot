@@ -32,7 +32,9 @@ public class ScheduledTask {
 		this.task = task;
 		this.period = period;
 
-		handler = plugin.bot.getTaskHandler();
+		// TODO
+		// handler = plugin.bot.getTaskHandler();
+		handler = null;
 	}
 
 	/**

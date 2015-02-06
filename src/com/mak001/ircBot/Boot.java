@@ -1,23 +1,15 @@
 package com.mak001.ircBot;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.lang.reflect.Constructor;
-import java.net.JarURLConnection;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.net.URLConnection;
 import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
+
+import org.jibble.pircbot.PircBot;
 
 import com.mak001.ircBot.gui.GUI;
 import com.mak001.ircBot.gui.simple.SimpleGUI;
-import com.mak001.api.plugins.Plugin;
 import com.mak001.ircBot.plugins.permissions.IRCPermissions;
 import com.mak001.ircBot.settings.Settings;
 import com.mak001.ircBot.settings.SettingsWriter;
@@ -27,9 +19,7 @@ public class Boot {
 	public static String SERVER;
 	public static String CHANNEL;
 
-	private static Class<?> c;
-	private static ClassLoader loader;
-	private static Bot bot;
+	private static PircBot bot;
 	private static GUI gui;
 
 	private static SimpleGUI simpleGUI;
@@ -53,9 +43,7 @@ public class Boot {
 		SERVER = Settings.get(Settings.SERVER);
 
 		// Now start our bot up.
-		bot = new Bot();
-
-		loadPlugins();
+		bot = new PircBot();
 
 		// Enable debugging output.
 		bot.setVerbose(true);
@@ -65,92 +53,6 @@ public class Boot {
 		bot.connect(SERVER);
 	}
 
-	private static void loadPlugins() {
-		File dir = new File(Settings.userHome + Settings.fileSeparator + "Plugins" + Settings.fileSeparator + "bin");
-		for (File f : dir.listFiles()) {
-			String trueName = f.getName().substring(0, f.getName().length() - 6);
-			if (f != null && !f.isDirectory() && !f.getName().contains("$") && !bot.getPlugins().contains(trueName)) {
-				if (f.getName().endsWith("class")) {
-					loadPluginClass(f.getName());
-				} else if (f.getName().endsWith(".jar")) {
-					loadPluginJar(f.getName());
-				}
-			}
-		}
-	}
-
-	public static boolean loadPluginJar(String fileName) {
-		String file_path = Settings.userHome + Settings.fileSeparator + "Plugins" + Settings.fileSeparator + "bin"
-				+ Settings.fileSeparator + fileName;
-		File f = new File(file_path);
-
-		String trueName = fileName.substring(0, fileName.length() - 4);
-		System.out.println("Adding jar: " + trueName);
-		try {
-			if (f != null && f.isFile() && f.toString().toLowerCase().endsWith(".jar")
-					&& f.getName().contains(fileName)) {
-
-				URL url = new URL("jar:file:///" + file_path + "!/");
-				URLConnection connection = url.openConnection();
-				JarFile file = ((JarURLConnection) connection).getJarFile();
-				Enumeration<JarEntry> eje = file.entries();
-
-				ClassLoader STAFLoader = Boot.class.getClassLoader();
-				URLClassLoader URLLoader = new URLClassLoader(new URL[] { url }, STAFLoader);
-
-				while (eje.hasMoreElements()) {
-					JarEntry je = eje.nextElement();
-
-					if (je.getName().endsWith(".class") && !je.getName().contains("$")) {
-
-						String className = je.getName().replaceAll("/", "\\.");
-						className = className.substring(0, className.length() - 6);
-						Class<?> clazz = Class.forName(className, true, URLLoader);
-						if (clazz.getSuperclass() == Plugin.class) {
-							Constructor<?>[] cs = clazz.getConstructors();
-							Object invoke = cs[0].newInstance(bot);
-							Plugin h = (Plugin) (invoke);
-							bot.add(h);
-							System.out.println("Added: " + trueName);
-							return true;
-						}
-					}
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return false;
-	}
-
-	public static boolean loadPluginClass(String fileName) {
-		File dir = new File(Settings.userHome + Settings.fileSeparator + "Plugins" + Settings.fileSeparator + "bin");
-		File f = new File(Settings.userHome + Settings.fileSeparator + "Plugins" + Settings.fileSeparator + "bin"
-				+ Settings.fileSeparator + fileName);
-
-		String trueName = fileName.substring(0, fileName.length() - 6);
-		System.out.println("Adding class: " + trueName);
-		try {
-
-			if (f != null && f.isFile() && f.toString().toLowerCase().endsWith(".class")
-					&& f.getName().contains(fileName) && !f.getName().contains("$")) {
-				loader = new URLClassLoader(new URL[] { dir.toURI().toURL() });
-				c = loader.loadClass(trueName);
-
-				Constructor<?>[] cs = c.getConstructors();
-				Object invoke = cs[0].newInstance(bot);
-				Plugin h = (Plugin) (invoke);
-				bot.add(h);
-
-				System.out.println("Added: " + trueName);
-				return true;
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return false;
-	}
 
 	private static void setUp() {
 		Settings.lineSeparator = System.getProperty("line.separator");
@@ -172,7 +74,7 @@ public class Boot {
 		}));
 	}
 
-	public static Bot getBot() {
+	public static PircBot getBot() {
 		return bot;
 	}
 

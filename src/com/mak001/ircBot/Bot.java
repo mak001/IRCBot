@@ -343,50 +343,6 @@ public class Bot extends PircBot {
 		}
 	}
 
-	public boolean loadPlugin(String name, String target, int x) {
-		boolean b = false;
-		if (name.endsWith(".jar")) {
-			b = Boot.loadPluginJar(name);
-		} else if (name.endsWith(".class")) {
-			b = Boot.loadPluginClass(name);
-		}
-		if (b) {
-			sendMessage(target, "Successfully loaded " + name);
-		} else {
-			sendMessage(target, "Failed to load " + name);
-		}
-		return b;
-	}
-
-	public boolean loadPlugin(String name, String domain) {
-		if (name.contains(".")) {
-			return Boot.loadPluginJar(domain.replace("!/", "").replace(
-					domain.substring(0, domain.lastIndexOf("\\") + 1), ""));
-		} else {
-			return Boot.loadPluginClass(name + ".class");
-		}
-	}
-
-	public void reloadPlugin(Plugin p) {
-		reloadPlugin(p, null);
-	}
-
-	public void reloadPlugin(Plugin p, String target) {
-		if (!p.getManifest().name().equals("Default commands") && !p.getManifest().name().equals("Permissions")) {
-			String name = p.getClass().getName();
-			String domain = p.getClass().getProtectionDomain().getCodeSource().getLocation().toExternalForm();
-			unloadPlugin(p);
-			boolean b = loadPlugin(name, domain);
-			if (target != null) {
-				if (b) {
-					sendMessage(target, "Successfully reloaded " + name);
-				} else {
-					this.sendMessage(target, "Failed to reload " + name);
-				}
-			}
-		}
-	}
-
 	public Plugin getPluginByName(String string) {
 		for (Plugin p : plugins) {
 			if (p.getManifest().name().equalsIgnoreCase(string)

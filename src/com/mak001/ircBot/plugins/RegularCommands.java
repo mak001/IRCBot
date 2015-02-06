@@ -164,7 +164,7 @@ public class RegularCommands extends Plugin {
 		public void onCommand(String channel, String sender, String login, String hostname, String additional) {
 			Plugin plugin = bot.getPluginByName(additional);
 			if (plugin != null) {
-				bot.reloadPlugin(plugin, sender);
+				// bot.reloadPlugin(plugin, sender);
 			} else {
 				bot.sendMessage(sender, "No plugin named " + additional + ".");
 			}
@@ -198,7 +198,7 @@ public class RegularCommands extends Plugin {
 
 		@Override
 		public void onCommand(String channel, String sender, String login, String hostname, String additional) {
-			bot.loadPlugin(additional, sender, 0);
+			// bot.loadPlugin(additional, sender, 0);
 		}
 
 		@Override
@@ -284,7 +284,7 @@ public class RegularCommands extends Plugin {
 		for (String author : pluginManifest.authors()) {
 			authors = authors + authors == "" ? "" : ", " + author;
 		}
-		return pluginManifest.name() + " by: " + authors + "   version: " + pluginManifest.version() + " - " + site + " - "
-				+ description;
+		return pluginManifest.name() + " by: " + authors + "   version: " + pluginManifest.version() + " - " + site
+				+ " - " + description;
 	}
 }

@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.jibble.pircbot.PircBot;
+
 import com.mak001.api.plugins.Command;
 import com.mak001.api.plugins.Plugin;
 import com.mak001.api.plugins.listeners.ActionListener;
@@ -21,7 +23,6 @@ import com.mak001.api.plugins.listeners.NoticeListener;
 import com.mak001.api.plugins.listeners.PartListener;
 import com.mak001.api.plugins.listeners.PrivateMessageListener;
 import com.mak001.api.plugins.listeners.QuitListener;
-import com.mak001.ircBot.Bot;
 import com.mak001.ircBot.plugin.permissions.Permission;
 
 
@@ -30,6 +31,7 @@ public class PluginManager {
 	private final Map<String, Plugin> plugins = new HashMap<String, Plugin>();
 	private final Map<ListenerTypes, List<Listener>> listeners = new HashMap<ListenerTypes, List<Listener>>();
 	private final Map<Plugin, List<Command>> commands = new HashMap<Plugin, List<Command>>();
+	private final List<Command> full_command_list = new ArrayList<Command>();
 	private final SimplePluginLoader pluginLoader;
 	private final Map<String, Permission> permissions = new HashMap<String, Permission>();
 
@@ -41,35 +43,27 @@ public class PluginManager {
 	 * 
 	 * @author Mak001
 	 */
-	private enum ListenerTypes
+	public enum ListenerTypes
 	{
-		ACTION_LISTENER(ActionListener.class, "Action listener"), CTCP_LISTENER(CTCPListener.class, "CTCP listener"), JOIN_LISTENER(
-				JoinListener.class, "Join listener"), MESSAGE_LISTENER(MessageListener.class, "Message listener"), MODE_LISTENER(
-				ModeListener.class, "Mode listener"), NICK_CHANGE_LISTENER(NickChangeListener.class,
-				"Nick change listener"), NOTICE_LISTENER(NoticeListener.class, "Notice listener"), PART_LISTENER(
-				PartListener.class, "Part listener"), PRIVATE_MESSAGE_LISTENER(PrivateMessageListener.class,
-				"Private message listener"), QUIT_LISTENER(QuitListener.class, "Quit listener");
+		ACTION_LISTENER("Action listener"), CTCP_LISTENER("CTCP listener"), JOIN_LISTENER("Join listener"), MESSAGE_LISTENER(
+				"Message listener"), MODE_LISTENER("Mode listener"), NICK_CHANGE_LISTENER("Nick change listener"), NOTICE_LISTENER(
+				"Notice listener"), PART_LISTENER("Part listener"), PRIVATE_MESSAGE_LISTENER("Private message listener"), QUIT_LISTENER(
+				"Quit listener");
 
-		private final Class<? extends Listener> clazz;
 		private final String name;
 
-		private ListenerTypes(Class<? extends Listener> clazz, String name) {
-			this.clazz = clazz;
+		private ListenerTypes(String name) {
 			this.name = name;
 		}
 
 		public String getName() {
 			return name;
 		}
-
-		public Class<? extends Listener> getBaseClass() {
-			return clazz;
-		}
 	}
 
-
-	public PluginManager(Bot bot) {
-		pluginLoader = new SimplePluginLoader(bot);
+	// TODO - ???? Make it so that each array is added with a different listener
+	public PluginManager(PircBot pircBot) {
+		pluginLoader = new SimplePluginLoader(pircBot, this);
 		for (ListenerTypes type : ListenerTypes.values()) {
 			listeners.put(type, new ArrayList<Listener>());
 		}
@@ -110,10 +104,35 @@ public class PluginManager {
 	}
 
 	private synchronized void registerListeners(Plugin plugin) {
-		for (ListenerTypes type : ListenerTypes.values()) {
-			if (plugin.getClass().isInstance(type.getBaseClass())) {
-				listeners.get(type).add(type.getBaseClass().cast(plugin));
-			}
+		if (plugin instanceof ActionListener) {
+			listeners.get(ListenerTypes.ACTION_LISTENER).add((ActionListener) plugin);
+		}
+		if (plugin instanceof CTCPListener) {
+			listeners.get(ListenerTypes.CTCP_LISTENER).add((CTCPListener) plugin);
+		}
+		if (plugin instanceof JoinListener) {
+			listeners.get(ListenerTypes.JOIN_LISTENER).add((JoinListener) plugin);
+		}
+		if (plugin instanceof MessageListener) {
+			listeners.get(ListenerTypes.MESSAGE_LISTENER).add((MessageListener) plugin);
+		}
+		if (plugin instanceof ModeListener) {
+			listeners.get(ListenerTypes.MODE_LISTENER).add((ModeListener) plugin);
+		}
+		if (plugin instanceof NickChangeListener) {
+			listeners.get(ListenerTypes.NICK_CHANGE_LISTENER).add((NickChangeListener) plugin);
+		}
+		if (plugin instanceof NoticeListener) {
+			listeners.get(ListenerTypes.NOTICE_LISTENER).add((NoticeListener) plugin);
+		}
+		if (plugin instanceof PartListener) {
+			listeners.get(ListenerTypes.PART_LISTENER).add((PartListener) plugin);
+		}
+		if (plugin instanceof PrivateMessageListener) {
+			listeners.get(ListenerTypes.PRIVATE_MESSAGE_LISTENER).add((PrivateMessageListener) plugin);
+		}
+		if (plugin instanceof QuitListener) {
+			listeners.get(ListenerTypes.QUIT_LISTENER).add((QuitListener) plugin);
 		}
 	}
 
@@ -132,7 +151,8 @@ public class PluginManager {
 				}
 			}
 		}
-		commands.remove(plugin);
+		full_command_list.removeAll(commands.remove(plugin));
+		pluginLoader.unloadPlugin(plugin.getManifest().name());
 	}
 
 	/**
@@ -148,6 +168,7 @@ public class PluginManager {
 		if (commands.get(command.getParentPlugin()) == null) {
 			commands.put(command.getParentPlugin(), new ArrayList<Command>());
 		}
+		full_command_list.add(command);
 		return commands.get(command.getParentPlugin()).add(command);
 	}
 
@@ -161,6 +182,7 @@ public class PluginManager {
 	 * @see ArrayList#remove(Object)
 	 */
 	public boolean unregisterCommand(Command command) {
+		full_command_list.remove(command);
 		return commands.get(command.getParentPlugin()).remove(command);
 	}
 
@@ -178,6 +200,39 @@ public class PluginManager {
 	 */
 	public List<Command> getCommands(Plugin plugin) {
 		return commands.get(plugin);
+	}
+
+	public boolean onCommand(String channel, String sender, String login, String hostname, String message) {
+		for (Command command : full_command_list) {
+			for (String c : command.getCommand()) {
+				if (message.toLowerCase().startsWith(c.toLowerCase())) {
+					System.out.println(c);
+					String newMessage = "";
+					if (c.length() + 1 <= message.length()) {
+						newMessage = message.replaceFirst(message.substring(0, c.length() + 1), "");
+					}
+					command.onCommand(channel, sender, login, hostname, newMessage);
+					return true;
+				} else if (message.toUpperCase().startsWith("HELP " + c.toUpperCase())) {
+					command.onHelp(channel, sender, login, hostname);
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Triggers all the listeners with the given type. The
+	 * listeners are supplied with the info they need with vars[].
+	 * 
+	 * @param type
+	 *            - The type of listener to trigger.
+	 * @param vars
+	 *            - the data to pass onto the listener
+	 */
+	public void triggerListener(ListenerTypes type, String... vars) {
+		triggerListener(type, 0, vars);
 	}
 
 	/**
