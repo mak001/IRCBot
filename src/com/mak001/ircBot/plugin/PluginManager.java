@@ -2,6 +2,7 @@ package com.mak001.ircBot.plugin;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -23,17 +24,21 @@ import com.mak001.api.plugins.listeners.NoticeListener;
 import com.mak001.api.plugins.listeners.PartListener;
 import com.mak001.api.plugins.listeners.PrivateMessageListener;
 import com.mak001.api.plugins.listeners.QuitListener;
-import com.mak001.ircBot.plugin.permissions.Permission;
+import com.mak001.ircBot.Bot;
+import com.mak001.ircBot.plugin.permissions.PermissionHandler;
+import com.mak001.ircBot.plugins.Permissions;
+import com.mak001.ircBot.plugins.RegularCommands;
 
 
 public class PluginManager {
 
 	private final Map<String, Plugin> plugins = new HashMap<String, Plugin>();
+	private final Map<String, Plugin> plugin_commands = new HashMap<String, Plugin>();
 	private final Map<ListenerTypes, List<Listener>> listeners = new HashMap<ListenerTypes, List<Listener>>();
 	private final Map<Plugin, List<Command>> commands = new HashMap<Plugin, List<Command>>();
 	private final List<Command> full_command_list = new ArrayList<Command>();
-	private final SimplePluginLoader pluginLoader;
-	private final Map<String, Permission> permissions = new HashMap<String, Permission>();
+	private final PluginLoader pluginLoader;
+	private final PermissionHandler permissionHandler;
 
 	public static final int CHANNEL_MODE_EVENT = 0, USER_MODE_EVENT = 1;
 	public static final int FINGER_EVENT = 0, PING_EVENT = 1, VERSION_EVENT = 1;
@@ -61,9 +66,13 @@ public class PluginManager {
 		}
 	}
 
-	// TODO - ???? Make it so that each array is added with a different listener
-	public PluginManager(PircBot pircBot) {
-		pluginLoader = new SimplePluginLoader(pircBot, this);
+	public PluginManager(Bot bot) {
+		pluginLoader = new PluginLoader(bot, this);
+		permissionHandler = new PermissionHandler();
+
+		addPlugin(new RegularCommands(bot));
+		addPlugin(new Permissions(bot));
+
 		for (ListenerTypes type : ListenerTypes.values()) {
 			listeners.put(type, new ArrayList<Listener>());
 		}
@@ -88,15 +97,23 @@ public class PluginManager {
 		if (file == null) return null;
 		Plugin result = pluginLoader.loadPlugin(file);
 		if (result != null) {
-			plugins.put(getPluginName(result), result);
-			registerListeners(result);
+			addPlugin(result);
 		}
 		return result;
 	}
 
+	public void reloadPlugin(String name) throws InvalidPluginException {
+		pluginLoader.reloadPlugin(name);
+	}
+
+	public void reloadPlugin(Plugin plugin) throws InvalidPluginException {
+		pluginLoader.reloadPlugin(plugin);
+	}
+
 	public void addPlugin(Plugin plugin) {
-		if (plugins.get(getPluginName(plugin)) == null) {
+		if (plugins.get(getPluginName(plugin)) == null && plugin_commands.get(plugin) == null) {
 			plugins.put(getPluginName(plugin), plugin);
+			plugin_commands.put(getPluginCommand(plugin), plugin);
 			registerListeners(plugin);
 		} else {
 
@@ -141,18 +158,22 @@ public class PluginManager {
 	}
 
 	public synchronized void removePlugin(Plugin plugin) {
-		Iterator<Entry<ListenerTypes, List<Listener>>> it = listeners.entrySet().iterator();
-		while (it.hasNext()) {
-			Map.Entry<ListenerTypes, List<Listener>> entry = it.next();
-			List<Listener> listener_list = entry.getValue();
-			if (listener_list != null && !listener_list.isEmpty()) {
-				for (Listener listener : listener_list) {
-					if (listener.equals(plugin)) listener_list.remove(plugin);
+		if (!isPermissions(plugin)) {
+			Iterator<Entry<ListenerTypes, List<Listener>>> it = listeners.entrySet().iterator();
+			while (it.hasNext()) {
+				Map.Entry<ListenerTypes, List<Listener>> entry = it.next();
+				List<Listener> listener_list = entry.getValue();
+				if (listener_list != null && !listener_list.isEmpty()) {
+					for (Listener listener : listener_list) {
+						if (listener.equals(plugin)) listener_list.remove(plugin);
+					}
 				}
 			}
+			plugins.remove(getPluginName(plugin));
+			plugin_commands.remove(getPluginCommand(plugin));
+			full_command_list.removeAll(commands.remove(plugin));
+			pluginLoader.unloadPlugin(plugin.getManifest().name());
 		}
-		full_command_list.removeAll(commands.remove(plugin));
-		pluginLoader.unloadPlugin(plugin.getManifest().name());
 	}
 
 	/**
@@ -182,8 +203,11 @@ public class PluginManager {
 	 * @see ArrayList#remove(Object)
 	 */
 	public boolean unregisterCommand(Command command) {
-		full_command_list.remove(command);
-		return commands.get(command.getParentPlugin()).remove(command);
+		if (!isPermissions(command.getParentPlugin())) {
+			full_command_list.remove(command);
+			return commands.get(command.getParentPlugin()).remove(command);
+		}
+		return false;
 	}
 
 	/**
@@ -191,6 +215,17 @@ public class PluginManager {
 	 */
 	public Map<Plugin, List<Command>> getCommands() {
 		return commands;
+	}
+
+	/**
+	 * @return A full list of commands.
+	 */
+	public List<Command> getAllCommands() {
+		List<Command> _commands = new ArrayList<Command>();
+		for (Plugin plugin : commands.keySet()) {
+			_commands.addAll(commands.get(plugin));
+		}
+		return _commands;
 	}
 
 	/**
@@ -204,6 +239,7 @@ public class PluginManager {
 
 	public boolean onCommand(String channel, String sender, String login, String hostname, String message) {
 		for (Command command : full_command_list) {
+			// TODO - check if user has permission
 			for (String c : command.getCommand()) {
 				if (message.toLowerCase().startsWith(c.toLowerCase())) {
 					System.out.println(c);
@@ -297,6 +333,18 @@ public class PluginManager {
 		}
 	}
 
+	public Plugin getPlugin(String name) {
+		return plugins.get(name);
+	}
+
+	public Plugin getPluginByCommand(String command) {
+		return plugin_commands.get(command);
+	}
+
+	public Collection<Plugin> getPlugins() {
+		return plugins.values();
+	}
+
 	/**
 	 * Gets a plugin's description. May return an empty String.
 	 * 
@@ -350,6 +398,14 @@ public class PluginManager {
 	 */
 	public String[] getPluginAuthors(Plugin plugin) {
 		return plugin.getManifest().authors();
+	}
+
+	public String getPluginCommand(Plugin plugin) {
+		return plugin.GENERAL_COMMAND;
+	}
+
+	private boolean isPermissions(Plugin p) {
+		return getPluginName(p).equals("Permissions") && p instanceof Permissions;
 	}
 
 }

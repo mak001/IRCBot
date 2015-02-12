@@ -1,6 +1,6 @@
 package com.mak001.api.plugins;
 
-import org.jibble.pircbot.PircBot;
+import com.mak001.ircBot.Bot;
 
 /**
  * All plugins must extend this class and have a {@link Manifest} A plugin will
@@ -15,7 +15,7 @@ public abstract class Plugin {
 	 * Used for setting up the help and about commands
 	 */
 	public final String GENERAL_COMMAND;
-	protected final PircBot bot;
+	protected final Bot bot;
 
 	/**
 	 * @param bot
@@ -23,7 +23,7 @@ public abstract class Plugin {
 	 * @param GENERAL_COMMAND
 	 *            - The command to respond to
 	 */
-	public Plugin(PircBot bot, String GENERAL_COMMAND) {
+	public Plugin(Bot bot, String GENERAL_COMMAND) {
 		this.GENERAL_COMMAND = GENERAL_COMMAND;
 		this.bot = bot;
 	}

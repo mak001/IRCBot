@@ -14,20 +14,19 @@ import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import org.jibble.pircbot.PircBot;
-
 import com.mak001.api.plugins.Plugin;
 import com.mak001.ircBot.Boot;
+import com.mak001.ircBot.Bot;
 
 
-public class SimplePluginLoader {
+public class PluginLoader {
 
 	private final Map<String, String> loaded_plugins = new HashMap<String, String>();
-	private final PircBot bot;
+	private final Bot bot;
 	private final PluginManager manager;
 
-	public SimplePluginLoader(PircBot pircBot, PluginManager manager) {
-		this.bot = pircBot;
+	public PluginLoader(Bot bot, PluginManager manager) {
+		this.bot = bot;
 		this.manager = manager;
 	}
 
@@ -74,7 +73,9 @@ public class SimplePluginLoader {
 			Object invoke = cs[0].newInstance(bot);
 			Plugin plugin = (Plugin) (invoke);
 			manager.addPlugin(plugin);
-			loaded_plugins.put(plugin.getManifest().name(), file.getCanonicalPath());
+			if (loaded_plugins.get(plugin.getManifest().name()) == null) {
+				loaded_plugins.put(plugin.getManifest().name(), file.getCanonicalPath());
+			}
 		}
 		return null;
 	}

@@ -1,12 +1,11 @@
 package com.mak001.ircBot.plugins;
 
-import org.jibble.pircbot.PircBot;
-
 import com.mak001.api.plugins.Command;
 import com.mak001.api.plugins.Command.CommandAction;
 import com.mak001.api.plugins.Manifest;
 import com.mak001.api.plugins.Plugin;
 import com.mak001.ircBot.Bot;
+import com.mak001.ircBot.plugin.InvalidPluginException;
 import com.mak001.ircBot.settings.Settings;
 
 @Manifest(authors = { "mak001" }, name = "Default commands", version = 1.0, description = "The default commands that came with the bot (not including the permission commands)")
@@ -20,18 +19,18 @@ public class RegularCommands extends Plugin {
 	public RegularCommands(Bot bot) {
 		super(bot, "CMD");
 
-		bot.registerCommand(say);
-		bot.registerCommand(join);
-		bot.registerCommand(part);
-		bot.registerCommand(nick);
-		bot.registerCommand(set);
-		bot.registerCommand(broadcast);
-		bot.registerCommand(load_plugin);
-		bot.registerCommand(reload_plugin);
-		bot.registerCommand(unload_plugin);
-		bot.registerCommand(shutdown);
-		bot.registerCommand(about);
-		bot.registerCommand(help);
+		bot.getPluginManager().registerCommand(say);
+		bot.getPluginManager().registerCommand(join);
+		bot.getPluginManager().registerCommand(part);
+		bot.getPluginManager().registerCommand(nick);
+		bot.getPluginManager().registerCommand(set);
+		bot.getPluginManager().registerCommand(broadcast);
+		bot.getPluginManager().registerCommand(load_plugin);
+		bot.getPluginManager().registerCommand(reload_plugin);
+		bot.getPluginManager().registerCommand(unload_plugin);
+		bot.getPluginManager().registerCommand(shutdown);
+		bot.getPluginManager().registerCommand(about);
+		bot.getPluginManager().registerCommand(help);
 	}
 
 	private boolean isChannel(String string) {
@@ -63,9 +62,9 @@ public class RegularCommands extends Plugin {
 		public void onCommand(String channel, String sender, String login, String hostname, String additional) {
 			if (!additional.contains(" ")) {
 				if (isChannel(additional)) {
-					bot.addChannel(additional);
-				} else {
-					bot.addChannel("#" + additional);
+					// bot.addChannel(additional);
+				} else { // TODO
+					// bot.addChannel("#" + additional);
 				}
 			} else {
 				bot.sendMessage(sender, additional + " is not a valid channel");
@@ -83,13 +82,13 @@ public class RegularCommands extends Plugin {
 		@Override
 		public void onCommand(String channel, String sender, String login, String hostname, String additional) {
 			if (additional != null && additional.equals("") && channel != null && !channel.equals("")) {
-				bot.removeChannel(channel);
+				// bot.removeChannel(channel);
 			}
 			if (!additional.contains(" ")) {
 				if (isChannel(additional)) {
-					bot.removeChannel(additional);
-				} else {
-					bot.removeChannel("#" + additional);
+					// bot.removeChannel(additional);
+				} else { // TODO
+					// bot.removeChannel("#" + additional);
 				}
 			} else {
 				bot.sendMessage(sender, additional + " is not a valid channel");
@@ -162,9 +161,14 @@ public class RegularCommands extends Plugin {
 
 		@Override
 		public void onCommand(String channel, String sender, String login, String hostname, String additional) {
-			Plugin plugin = bot.getPluginByName(additional);
+			Plugin plugin = bot.getPluginManager().getPlugin(additional);
 			if (plugin != null) {
-				// bot.reloadPlugin(plugin, sender);
+				try {
+					bot.getPluginManager().reloadPlugin(plugin);
+				} catch (InvalidPluginException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			} else {
 				bot.sendMessage(sender, "No plugin named " + additional + ".");
 			}
@@ -180,9 +184,9 @@ public class RegularCommands extends Plugin {
 
 		@Override
 		public void onCommand(String channel, String sender, String login, String hostname, String additional) {
-			Plugin plugin = bot.getPluginByName(additional);
+			Plugin plugin = bot.getPluginManager().getPlugin(additional);
 			if (plugin != null) {
-				bot.unloadPlugin(plugin, sender);
+				bot.getPluginManager().removePlugin(plugin);
 			} else {
 				bot.sendMessage(sender, "No plugin named " + additional + ".");
 			}
@@ -227,14 +231,14 @@ public class RegularCommands extends Plugin {
 		public void onCommand(String channel, String sender, String login, String hostname, String additional) {
 			String target = channel == null ? sender : channel;
 			if (additional != null && !additional.equals("")) {
-				for (Plugin p : bot.getPlugins()) {
+				for (Plugin p : bot.getPluginManager().getPlugins()) {
 					if (p.GENERAL_COMMAND.equalsIgnoreCase(additional)) {
 						bot.sendMessage(sender, getPluginInfo(p));
 						return;
 					}
 				}
 			} else {
-				bot.sendMessage(target, "MAK001's bot built on PIRC " + PircBot.VERSION);
+				bot.sendMessage(target, "MAK001's bot built on PIRC " + Bot.VERSION);
 			}
 		}
 
@@ -252,19 +256,17 @@ public class RegularCommands extends Plugin {
 			if (additional == null || additional.equals("")) {
 				bot.sendMessage(sender, "This will list every plugin command, use " + Settings.COMMAND_PREFIX
 						+ "HELP <PLUGIN COMMAND>   for more help with an individual plugin.");
-				for (Plugin p : bot.getPlugins()) {
+				for (Plugin p : bot.getPluginManager().getPlugins()) {
 					String name = p.getManifest().name();
 					bot.sendMessage(sender, name + " - " + p.GENERAL_COMMAND);
 				}
 			} else {
-				bot.sendMessage(sender, "This will list every commands from a plugin");
-				for (Plugin p : bot.getPlugins()) {
-					if (additional.equalsIgnoreCase(p.GENERAL_COMMAND)) {
-						for (Command c : bot.getCommands()) {
-							if (c.getParentPlugin().equals(p)) {
-								c.onHelp(channel, sender, login, hostname);
-							}
-						}
+				Plugin plugin = bot.getPluginManager().getPluginByCommand(additional);
+				if (plugin != null) {
+					bot.sendMessage(sender, "This will list every commands from "
+							+ bot.getPluginManager().getPluginName(plugin));
+					for (Command c : bot.getPluginManager().getCommands(plugin)) {
+						c.onHelp(channel, sender, login, hostname);
 					}
 				}
 			}

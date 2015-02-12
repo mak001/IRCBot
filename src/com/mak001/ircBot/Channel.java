@@ -8,8 +8,9 @@ public class Channel {
 	private final String name;
 	private ArrayList<Character> modes = new ArrayList<Character>();
 
-	public Channel(String name) {
+	public Channel(String name, Bot bot) {
 		this.name = name;
+		bot.setMode(name, "");
 	}
 
 	public String getName() {

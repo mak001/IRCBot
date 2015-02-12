@@ -2,11 +2,11 @@ package com.mak001.ircBot.plugins;
 
 import java.util.ArrayList;
 
-import com.mak001.ircBot.Bot;
 import com.mak001.api.plugins.Command;
 import com.mak001.api.plugins.Command.CommandAction;
 import com.mak001.api.plugins.Manifest;
 import com.mak001.api.plugins.Plugin;
+import com.mak001.ircBot.Bot;
 import com.mak001.ircBot.plugins.permissions.IRCPermissions;
 import com.mak001.ircBot.plugins.permissions.User;
 import com.mak001.ircBot.settings.Settings;
@@ -21,21 +21,21 @@ public class Permissions extends Plugin {
 	public Permissions(Bot bot) {
 		super(bot, "PEX");
 
-		bot.registerCommand(get_user_group);
-		bot.registerCommand(get_user_exceptions);
-		bot.registerCommand(get_user_permissions);
+		bot.getPluginManager().registerCommand(get_user_group);
+		bot.getPluginManager().registerCommand(get_user_exceptions);
+		bot.getPluginManager().registerCommand(get_user_permissions);
 
-		bot.registerCommand(get_group_exceptions);
-		bot.registerCommand(get_group_permissions);
-		bot.registerCommand(get_group_users);
+		bot.getPluginManager().registerCommand(get_group_exceptions);
+		bot.getPluginManager().registerCommand(get_group_permissions);
+		bot.getPluginManager().registerCommand(get_group_users);
 
-		bot.registerCommand(add_user_permission);
-		bot.registerCommand(add_group_permission);
-		bot.registerCommand(add_group_user);
+		bot.getPluginManager().registerCommand(add_user_permission);
+		bot.getPluginManager().registerCommand(add_group_permission);
+		bot.getPluginManager().registerCommand(add_group_user);
 
-		bot.registerCommand(remove_user_permission);
-		bot.registerCommand(remove_group_permission);
-		bot.registerCommand(remove_group_user);
+		bot.getPluginManager().registerCommand(remove_user_permission);
+		bot.getPluginManager().registerCommand(remove_group_permission);
+		bot.getPluginManager().registerCommand(remove_group_user);
 	}
 
 	private Command get_user_group = new Command(this, "GET USER GROUP", new CommandAction() {

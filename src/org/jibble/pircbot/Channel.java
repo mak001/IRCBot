@@ -31,6 +31,15 @@ public class Channel {
 		return users;
 	}
 
+	@Override
+	public boolean equals(Object chan) {
+		if (chan instanceof Channel) {
+			if (this == chan) return true;
+			if (this.name.equals(((Channel) chan).name)) return true;
+		}
+		return false;
+	}
+
 	public ArrayList<Modes> getModes() {
 		return modes;
 	}
