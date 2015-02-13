@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import org.jibble.pircbot.PircBot;
 
 import com.mak001.ircBot.plugin.PluginManager;
-import com.mak001.ircBot.plugin.PluginManager.ListenerTypes;
 import com.mak001.ircBot.plugins.permissions.IRCPermissions;
 import com.mak001.ircBot.settings.Settings;
 import com.mak001.ircBot.settings.SettingsWriter;
@@ -65,7 +64,7 @@ public class Bot extends PircBot {
 			String s = message.replace(Settings.get(Settings.COMMAND_PREFIX), "");
 			manager.onCommand(channel, sender, login, hostname, s);
 		} else {
-			manager.triggerListener(ListenerTypes.MESSAGE_LISTENER, channel, sender, login, hostname, message);
+			manager.triggerMessageListeners(channel, sender, login, hostname, message);
 		}
 	}
 
@@ -75,33 +74,33 @@ public class Bot extends PircBot {
 			String s = message.replace(Settings.get(Settings.COMMAND_PREFIX), "");
 			manager.onCommand(sender, sender, login, hostname, s);
 		} else {
-			manager.triggerListener(ListenerTypes.PRIVATE_MESSAGE_LISTENER, sender, login, hostname, message);
+			manager.triggerPrivateMessageListeners(sender, login, hostname, message);
 		}
 	}
 
 	@Override
 	public void onAction(String sender, String login, String hostname, String target, String action) {
-		manager.triggerListener(ListenerTypes.ACTION_LISTENER, sender, login, hostname, target, action);
+		manager.triggerActionListeners(sender, login, hostname, target, action);
 	}
 
 	@Override
 	public void onNotice(String sourceNick, String sourceLogin, String sourceHostname, String target, String notice) {
-		manager.triggerListener(ListenerTypes.NOTICE_LISTENER, sourceNick, sourceLogin, sourceHostname, target, notice);
+		manager.triggerNoticeListeners(sourceNick, sourceLogin, sourceHostname, target, notice);
 	}
 
 	@Override
 	public void onJoin(String channel, String sender, String login, String hostname) {
-		manager.triggerListener(ListenerTypes.JOIN_LISTENER, channel, sender, login, hostname);
+		manager.triggerJoinListeners(channel, sender, login, hostname);
 	}
 
 	@Override
 	public void onPart(String channel, String sender, String login, String hostname) {
-		manager.triggerListener(ListenerTypes.PART_LISTENER, channel, sender, login, hostname);
+		manager.triggerPartListeners(channel, sender, login, hostname);
 	}
 
 	@Override
 	public void onNickChange(String oldNick, String login, String hostname, String newNick) {
-		manager.triggerListener(ListenerTypes.NICK_CHANGE_LISTENER, oldNick, login, hostname, newNick);
+		manager.triggerNickChangeListeners(oldNick, login, hostname, newNick);
 	}
 
 	@Override
@@ -124,33 +123,29 @@ public class Bot extends PircBot {
 				chan.addModes(mode);
 			}
 		}
-		manager.triggerListener(ListenerTypes.MODE_LISTENER, PluginManager.CHANNEL_MODE_EVENT, channel, sourceNick,
-				sourceLogin, sourceHostname, mode);
+		manager.triggerChannelModeListeners(channel, sourceNick, sourceLogin, sourceHostname, mode);
 	}
 
 	@Override
 	public void onUserMode(String channel, String sourceNick, String sourceLogin, String sourceHostname, String mode) {
-		manager.triggerListener(ListenerTypes.MODE_LISTENER, PluginManager.USER_MODE_EVENT, channel, sourceNick,
-				sourceLogin, sourceHostname, mode);
+		manager.triggerUserModeListeners(channel, sourceNick, sourceLogin, sourceHostname, mode);
 	}
 
 	@Override
 	public void onQuit(String sourceNick, String sourceLogin, String sourceHostname, String reason) {
-		manager.triggerListener(ListenerTypes.QUIT_LISTENER, sourceNick, sourceLogin, sourceHostname, reason);
+		manager.triggerQuitListeners(sourceNick, sourceLogin, sourceHostname, reason);
 	}
 
 	@Override
 	protected void onVersion(String sourceNick, String sourceLogin, String sourceHostname, String target) {
 		super.onVersion(sourceNick, sourceLogin, sourceHostname, target);
-		manager.triggerListener(ListenerTypes.CTCP_LISTENER, PluginManager.VERSION_EVENT, sourceNick, sourceLogin,
-				sourceHostname, target);
+		manager.triggerVersionListeners(sourceNick, sourceLogin, sourceHostname, target);
 	}
 
 	@Override
 	protected void onPing(String sourceNick, String sourceLogin, String sourceHostname, String target, String pingValue) {
 		super.onPing(sourceNick, sourceLogin, sourceHostname, target, pingValue);
-		manager.triggerListener(ListenerTypes.CTCP_LISTENER, PluginManager.PING_EVENT, sourceNick, sourceLogin,
-				sourceHostname, target, pingValue);
+		manager.triggerPingListeners(sourceNick, sourceLogin, sourceHostname, target, pingValue);
 	}
 
 	@Override
@@ -166,8 +161,26 @@ public class Bot extends PircBot {
 	@Override
 	protected void onFinger(String sourceNick, String sourceLogin, String sourceHostname, String target) {
 		super.onFinger(sourceNick, sourceLogin, sourceHostname, target);
-		manager.triggerListener(ListenerTypes.CTCP_LISTENER, PluginManager.FINGER_EVENT, sourceNick, sourceLogin,
-				sourceHostname, target);
+		manager.triggerFingerListeners(sourceNick, sourceLogin, sourceHostname, target);
+	}
+
+	@Override
+	protected void onServerResponse(int code, String response) {
+		if (code == RPL_CHANNELMODEIS) {
+			String[] parts = response.split(" ");
+			Channel chan = getChannelByName(parts[1]);
+			String modes = parts[2];
+			if (channels.contains(chan)) {
+				if (modes.startsWith("+")) {
+					chan.addModes(modes);
+				} else {
+					chan.removeModes(modes);
+				}
+			}
+			Channel chann = new Channel(parts[1], null);
+			channels.add(chann);
+			if (modes.contains("+")) chann.addModes(modes);
+		}
 	}
 
 	private boolean isCommand(String message) {
@@ -228,23 +241,6 @@ public class Bot extends PircBot {
 		return null;
 	}
 
-	protected void onServerResponse(int code, String response) {
-		if (code == RPL_CHANNELMODEIS) {
-			String[] parts = response.split(" ");
-			Channel chan = getChannelByName(parts[1]);
-			String modes = parts[2];
-			if (channels.contains(chan)) {
-				if (modes.startsWith("+")) {
-					chan.addModes(modes);
-				} else {
-					chan.removeModes(modes);
-				}
-			}
-			Channel chann = new Channel(parts[1], null);
-			channels.add(chann);
-			if (modes.contains("+")) chann.addModes(modes);
-		}
-	}
 
 	public void createPermissionsUser(String user) {
 		if (IRCPermissions.getUser(user) == null) {

@@ -19,7 +19,7 @@ public abstract class Plugin {
 
 	/**
 	 * @param bot
-	 *            - Just make your constructor Plugin(MyBot myBot)
+	 *            - Just make your constructor Plugin(Bot bot)
 	 * @param GENERAL_COMMAND
 	 *            - The command to respond to
 	 */
@@ -31,8 +31,50 @@ public abstract class Plugin {
 	/**
 	 * @return The manifest of the plugin
 	 */
-	public Manifest getManifest() {
+	public final Manifest getManifest() {
 		return getClass().getAnnotation(Manifest.class);
+	}
+
+	/**
+	 * @return The name of the plugin
+	 */
+	public final String getName() {
+		return getManifest().name();
+	}
+
+	/**
+	 * @return The version of the plugin
+	 */
+	public final double getVersion() {
+		return getManifest().version();
+	}
+
+	/**
+	 * @return The authors of the plugin
+	 */
+	public final String[] getAuthors() {
+		return getManifest().authors();
+	}
+
+	/**
+	 * @return The description of the plugin
+	 */
+	public final String getDiscription() {
+		return getManifest().description();
+	}
+
+	/**
+	 * @return The website of the plugin
+	 */
+	public final String getWebsite() {
+		return getManifest().website();
+	}
+
+	/**
+	 * @return The command of the plugin
+	 */
+	public final String getCommand() {
+		return GENERAL_COMMAND;
 	}
 
 }

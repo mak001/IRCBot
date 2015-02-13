@@ -263,8 +263,7 @@ public class RegularCommands extends Plugin {
 			} else {
 				Plugin plugin = bot.getPluginManager().getPluginByCommand(additional);
 				if (plugin != null) {
-					bot.sendMessage(sender, "This will list every commands from "
-							+ bot.getPluginManager().getPluginName(plugin));
+					bot.sendMessage(sender, "This will list every commands from " + plugin.getName());
 					for (Command c : bot.getPluginManager().getCommands(plugin)) {
 						c.onHelp(channel, sender, login, hostname);
 					}

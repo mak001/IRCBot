@@ -47,7 +47,7 @@ public class PluginLoader {
 	}
 
 	public Plugin reloadPlugin(Plugin plugin) throws InvalidPluginException {
-		return reloadPlugin(plugin.getManifest().name());
+		return reloadPlugin(plugin.getName());
 	}
 
 	public Plugin reloadPlugin(String plugin_name) throws InvalidPluginException {
@@ -55,7 +55,7 @@ public class PluginLoader {
 	}
 
 	public void unloadPlugin(Plugin plugin) {
-		unloadPlugin(plugin.getManifest().name());
+		unloadPlugin(plugin.getName());
 	}
 
 	public void unloadPlugin(String plugin_name) {
@@ -73,8 +73,8 @@ public class PluginLoader {
 			Object invoke = cs[0].newInstance(bot);
 			Plugin plugin = (Plugin) (invoke);
 			manager.addPlugin(plugin);
-			if (loaded_plugins.get(plugin.getManifest().name()) == null) {
-				loaded_plugins.put(plugin.getManifest().name(), file.getCanonicalPath());
+			if (loaded_plugins.get(plugin.getName()) == null) {
+				loaded_plugins.put(plugin.getName(), file.getCanonicalPath());
 			}
 		}
 		return null;
