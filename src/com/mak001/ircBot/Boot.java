@@ -6,8 +6,6 @@ import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.List;
 
-import org.jibble.pircbot.PircBot;
-
 import com.mak001.ircBot.gui.GUI;
 import com.mak001.ircBot.gui.simple.SimpleGUI;
 import com.mak001.ircBot.plugins.permissions.IRCPermissions;
@@ -19,7 +17,7 @@ public class Boot {
 	public static String SERVER;
 	public static String CHANNEL;
 
-	private static PircBot bot;
+	private static Bot bot;
 	private static GUI gui;
 
 	private static SimpleGUI simpleGUI;
@@ -43,7 +41,7 @@ public class Boot {
 		SERVER = Settings.get(Settings.SERVER);
 
 		// Now start our bot up.
-		bot = new PircBot();
+		bot = new Bot();
 
 		// Enable debugging output.
 		bot.setVerbose(true);
@@ -74,7 +72,7 @@ public class Boot {
 		}));
 	}
 
-	public static PircBot getBot() {
+	public static Bot getBot() {
 		return bot;
 	}
 

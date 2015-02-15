@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import org.jibble.pircbot.PircBot;
 
 import com.mak001.ircBot.plugin.PluginManager;
+import com.mak001.ircBot.plugins.Permissions;
+import com.mak001.ircBot.plugins.RegularCommands;
 import com.mak001.ircBot.plugins.permissions.IRCPermissions;
 import com.mak001.ircBot.settings.Settings;
 import com.mak001.ircBot.settings.SettingsWriter;
@@ -18,6 +20,8 @@ public class Bot extends PircBot {
 
 	public Bot() {
 		manager = new PluginManager(this);
+		manager.addPlugin(new RegularCommands(this));
+		manager.addPlugin(new Permissions(this));
 		File folder = new File(Settings.userHome + Settings.fileSeparator + "Plugins" + Settings.fileSeparator + "bin");
 		for (File file : folder.listFiles()) {
 			try {

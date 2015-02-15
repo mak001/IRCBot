@@ -21,10 +21,9 @@ import com.mak001.api.plugins.listeners.PartListener;
 import com.mak001.api.plugins.listeners.PrivateMessageListener;
 import com.mak001.api.plugins.listeners.QuitListener;
 import com.mak001.ircBot.Bot;
-import com.mak001.ircBot.plugin.permissions.PermissionHandler;
+import com.mak001.ircBot.permissions.PermissionHandler;
 import com.mak001.ircBot.plugins.Permissions;
 import com.mak001.ircBot.plugins.RegularCommands;
-
 
 public class PluginManager {
 
@@ -64,10 +63,7 @@ public class PluginManager {
 		listeners.add(quitListeners);
 
 		pluginLoader = new PluginLoader(bot, this);
-		permissionHandler = new PermissionHandler();
-
-		addPlugin(new RegularCommands(bot));
-		addPlugin(new Permissions(bot));
+		permissionHandler = new PermissionHandler(); // TODO - move to bot?
 	}
 
 	/**
@@ -106,6 +102,7 @@ public class PluginManager {
 		if (plugins.get(plugin.getName()) == null && plugin_commands.get(plugin) == null) {
 			plugins.put(plugin.getName(), plugin);
 			plugin_commands.put(plugin.getCommand(), plugin);
+			// commands.put(plugin, new ArrayList<Command>());
 			registerListeners(plugin);
 		} else {
 
@@ -149,7 +146,7 @@ public class PluginManager {
 		removePlugin(plugins.get(name));
 	}
 
-	public synchronized void removePlugin(Plugin plugin) { // TODO
+	public synchronized void removePlugin(Plugin plugin) { // TODO - test
 		if (!isPermissions(plugin) && !isDefault(plugin)) {
 			for (List<? extends Listener> _listeners : listeners) {
 				for (Listener l : _listeners) {
@@ -225,20 +222,21 @@ public class PluginManager {
 	}
 
 	public boolean onCommand(String channel, String sender, String login, String hostname, String message) {
+		// TODO - clean up so it doesn't call User.hasPermision() multiple times
 		for (Command command : full_command_list) {
-			// TODO - check if user has permission
 			for (String c : command.getCommand()) {
-				if (message.toLowerCase().startsWith(c.toLowerCase())) {
-					System.out.println(c);
-					String newMessage = "";
-					if (c.length() + 1 <= message.length()) {
-						newMessage = message.replaceFirst(message.substring(0, c.length() + 1), "");
+				if (permissionHandler.getUser(sender).hasPermission(command.getPermission())) {
+					if (message.toLowerCase().startsWith(c.toLowerCase())) {
+						String newMessage = "";
+						if (c.length() + 1 <= message.length()) {
+							newMessage = message.replaceFirst(message.substring(0, c.length() + 1), "");
+						}
+						command.onCommand(channel, sender, login, hostname, newMessage);
+						return true;
+					} else if (message.toUpperCase().startsWith("HELP " + c.toUpperCase())) {
+						command.onHelp(channel, sender, login, hostname);
+						return true;
 					}
-					command.onCommand(channel, sender, login, hostname, newMessage);
-					return true;
-				} else if (message.toUpperCase().startsWith("HELP " + c.toUpperCase())) {
-					command.onHelp(channel, sender, login, hostname);
-					return true;
 				}
 			}
 		}
