@@ -30,7 +30,6 @@ public class RegularCommands extends Plugin {
 		bot.getPluginManager().registerCommand(unload_plugin);
 		bot.getPluginManager().registerCommand(shutdown);
 		bot.getPluginManager().registerCommand(about);
-		bot.getPluginManager().registerCommand(help);
 	}
 
 	private boolean isChannel(String string) {
@@ -246,33 +245,6 @@ public class RegularCommands extends Plugin {
 		public void onHelp(String channel, String sender, String login, String hostname) {
 			bot.sendMessage(sender, "Gets info on the bot or plugin : Syntax: " + prefix
 					+ "ABOUT <GENERAL PLUGIN COMMAND>");
-		}
-	});
-
-	private Command help = new Command(this, "HELP", new CommandAction() {
-
-		@Override
-		public void onCommand(String channel, String sender, String login, String hostname, String additional) {
-			if (additional == null || additional.equals("")) {
-				bot.sendMessage(sender, "This will list every plugin command, use " + Settings.COMMAND_PREFIX
-						+ "HELP <PLUGIN COMMAND>   for more help with an individual plugin.");
-				for (Plugin p : bot.getPluginManager().getPlugins()) {
-					String name = p.getManifest().name();
-					bot.sendMessage(sender, name + " - " + p.GENERAL_COMMAND);
-				}
-			} else {
-				Plugin plugin = bot.getPluginManager().getPluginByCommand(additional);
-				if (plugin != null) {
-					bot.sendMessage(sender, "This will list every commands from " + plugin.getName());
-					for (Command c : bot.getPluginManager().getCommands(plugin)) {
-						c.onHelp(channel, sender, login, hostname);
-					}
-				}
-			}
-		}
-
-		@Override
-		public void onHelp(String channel, String sender, String login, String hostname) {
 		}
 	});
 

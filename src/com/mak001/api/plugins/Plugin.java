@@ -77,4 +77,12 @@ public abstract class Plugin {
 		return GENERAL_COMMAND;
 	}
 
+	public final boolean equals(Object o) {
+		if (this == o) return true;
+		if (o instanceof Plugin) {
+			if (getName().equals((Plugin) o)) return true;
+		}
+		return false;
+	}
+
 }

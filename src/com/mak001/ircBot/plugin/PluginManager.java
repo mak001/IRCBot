@@ -24,15 +24,15 @@ import com.mak001.ircBot.Bot;
 import com.mak001.ircBot.permissions.PermissionHandler;
 import com.mak001.ircBot.plugins.Permissions;
 import com.mak001.ircBot.plugins.RegularCommands;
+import com.mak001.ircBot.settings.Settings;
 
 public class PluginManager {
 
 	private final Map<String, Plugin> plugins = new HashMap<String, Plugin>();
-	private final Map<String, Plugin> plugin_commands = new HashMap<String, Plugin>();
-	private final Map<Plugin, List<Command>> commands = new HashMap<Plugin, List<Command>>();
-	private final List<Command> full_command_list = new ArrayList<Command>();
 	private final PluginLoader pluginLoader;
 	private final PermissionHandler permissionHandler;
+	private final CommandManager commandManager;
+	private final Bot bot;
 
 
 	private final List<List<? extends Listener>> listeners = new ArrayList<List<? extends Listener>>();
@@ -51,6 +51,7 @@ public class PluginManager {
 	public static final int FINGER_EVENT = 0, PING_EVENT = 1, VERSION_EVENT = 1;
 
 	public PluginManager(Bot bot) {
+		this.bot = bot;
 		listeners.add(actionListeners);
 		listeners.add(ctcpListeners);
 		listeners.add(joinListeners);
@@ -63,6 +64,7 @@ public class PluginManager {
 		listeners.add(quitListeners);
 
 		pluginLoader = new PluginLoader(bot, this);
+		commandManager = new CommandManager();
 		permissionHandler = new PermissionHandler(); // TODO - move to bot?
 	}
 
@@ -98,14 +100,13 @@ public class PluginManager {
 		pluginLoader.reloadPlugin(plugin);
 	}
 
-	public void addPlugin(Plugin plugin) {
-		if (plugins.get(plugin.getName()) == null && plugin_commands.get(plugin) == null) {
+	public synchronized void addPlugin(Plugin plugin) {
+		if (plugins.get(plugin.getName()) == null) {
 			plugins.put(plugin.getName(), plugin);
-			plugin_commands.put(plugin.getCommand(), plugin);
-			// commands.put(plugin, new ArrayList<Command>());
+			commandManager.addPluginCommand(plugin);
 			registerListeners(plugin);
 		} else {
-
+			// TODO ???
 		}
 	}
 
@@ -153,9 +154,8 @@ public class PluginManager {
 					if (l.equals(plugin)) _listeners.remove(plugin);
 				}
 			}
+			commandManager.removeCommands(plugin);
 			plugins.remove(plugin.getName());
-			plugin_commands.remove(plugin.getCommand());
-			full_command_list.removeAll(commands.remove(plugin));
 			pluginLoader.unloadPlugin(plugin.getManifest().name());
 		}
 	}
@@ -170,11 +170,7 @@ public class PluginManager {
 	 * @see ArrayList#add(Object)
 	 */
 	public boolean registerCommand(Command command) {
-		if (commands.get(command.getParentPlugin()) == null) {
-			commands.put(command.getParentPlugin(), new ArrayList<Command>());
-		}
-		full_command_list.add(command);
-		return commands.get(command.getParentPlugin()).add(command);
+		return commandManager.addCommand(command);
 	}
 
 	/**
@@ -186,61 +182,78 @@ public class PluginManager {
 	 * 
 	 * @see ArrayList#remove(Object)
 	 */
-	public boolean unregisterCommand(Command command) {
-		if (!isPermissions(command.getParentPlugin())) {
-			full_command_list.remove(command);
-			return commands.get(command.getParentPlugin()).remove(command);
-		}
-		return false;
+	public void unregisterCommand(Command command) {
+		commandManager.removeCommand(command);
 	}
 
 	/**
 	 * @return A map of Commands with the linked plugins.
 	 */
-	public Map<Plugin, List<Command>> getCommands() {
-		return commands;
+	public Map<String, List<Command>> getCommands() {
+		return commandManager.getAllCommandsByPlugin();
 	}
 
 	/**
 	 * @return A full list of commands.
 	 */
 	public List<Command> getAllCommands() {
-		List<Command> _commands = new ArrayList<Command>();
-		for (Plugin plugin : commands.keySet()) {
-			_commands.addAll(commands.get(plugin));
-		}
-		return _commands;
-	}
-
-	/**
-	 * @param plugin
-	 *            - The plugin to get the registered commands from.
-	 * @return A list of Commands that are related to the plugin.
-	 */
-	public List<Command> getCommands(Plugin plugin) {
-		return commands.get(plugin);
+		return commandManager.getAllCommands();
 	}
 
 	public boolean onCommand(String channel, String sender, String login, String hostname, String message) {
-		// TODO - clean up so it doesn't call User.hasPermision() multiple times
-		for (Command command : full_command_list) {
-			for (String c : command.getCommand()) {
-				if (permissionHandler.getUser(sender).hasPermission(command.getPermission())) {
-					if (message.toLowerCase().startsWith(c.toLowerCase())) {
-						String newMessage = "";
-						if (c.length() + 1 <= message.length()) {
-							newMessage = message.replaceFirst(message.substring(0, c.length() + 1), "");
-						}
-						command.onCommand(channel, sender, login, hostname, newMessage);
-						return true;
-					} else if (message.toUpperCase().startsWith("HELP " + c.toUpperCase())) {
-						command.onHelp(channel, sender, login, hostname);
-						return true;
-					}
-				}
+		boolean wasHelp = false;
+		if (message.toUpperCase().startsWith("HELP")) {
+			String add = message.replaceFirst("(?i)HELP", "").replaceFirst(" ", "");
+			wasHelp = !onHelp(channel, sender, login, hostname, add);
+			// TODO
+		}
+		Command command = commandManager.getCommand(message);
+		if (command == null) return false;
+		if (permissionHandler.getUser(sender).hasPermission(command.getPermission())) {
+			if (wasHelp) {
+				command.onHelp(channel, sender, login, hostname);
+				return true;
+			} else {
+				command.onCommand(channel, sender, login, hostname, commandManager.getAdditional(command, message));
+				return true;
 			}
 		}
 		return false;
+	}
+
+	private boolean onHelp(String channel, String sender, String login, String hostname, String message) {
+		if (message.equals("") || message.replace(" ", "").equals("")) {
+			bot.sendMessage(sender, "This will list every plugin command, use " + Settings.get(Settings.COMMAND_PREFIX)
+					+ "HELP <PLUGIN COMMAND>   for more help with an individual plugin.");
+			for (Plugin p : getPlugins()) {
+				String name = p.getManifest().name();
+				System.out.println(name);
+				bot.sendMessage(sender, name + " - " + p.GENERAL_COMMAND);
+			}
+			return true;
+		} else {
+			String com = "";
+			if (message.startsWith(" ")) message = message.replaceFirst(" ", "").toUpperCase();
+			if (message.contains(" ")) {
+				com = message.split(" ")[0];
+			} else {
+				com = message;
+			}
+			System.out.println("looking for command \"" + com + "\"");
+			Plugin plugin = commandManager.getPluginByCommand(com);
+			if (plugin != null) {
+				bot.sendMessage(sender, "This will list every commands from " + plugin.getName());
+				List<Command> coms = commandManager.getCommands(plugin.getName());
+				System.out.println("are commands null? " + (coms == null));
+				System.out.println("are commands empty? " + coms.isEmpty());
+				for (Command c : coms) {
+					c.onHelp(channel, sender, login, hostname);
+				}
+				return true;
+			} else {
+				return false;
+			}
+		}
 	}
 
 	public void triggerActionListeners(String sender, String login, String hostname, String target, String action) {
@@ -329,10 +342,6 @@ public class PluginManager {
 		return plugins.get(name);
 	}
 
-	public Plugin getPluginByCommand(String command) {
-		return plugin_commands.get(command);
-	}
-
 	public Collection<Plugin> getPlugins() {
 		return plugins.values();
 	}
@@ -344,5 +353,4 @@ public class PluginManager {
 	private boolean isDefault(Plugin p) {
 		return p.getName().equals("Default commands") && p instanceof RegularCommands;
 	}
-
 }

@@ -72,9 +72,13 @@ public class PluginLoader {
 			Constructor<?>[] cs = clazz.getConstructors();
 			Object invoke = cs[0].newInstance(bot);
 			Plugin plugin = (Plugin) (invoke);
-			manager.addPlugin(plugin);
-			if (loaded_plugins.get(plugin.getName()) == null) {
-				loaded_plugins.put(plugin.getName(), file.getCanonicalPath());
+			if (plugin.getManifest() == null) {
+				System.out.println("Failed to load " + file.toString() + ".  No manifest.");
+			} else {
+				manager.addPlugin(plugin);
+				if (loaded_plugins.get(plugin.getName()) == null) {
+					loaded_plugins.put(plugin.getName(), file.getCanonicalPath());
+				}
 			}
 		}
 		return null;
