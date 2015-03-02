@@ -21,7 +21,6 @@ import com.mak001.api.plugins.listeners.PartListener;
 import com.mak001.api.plugins.listeners.PrivateMessageListener;
 import com.mak001.api.plugins.listeners.QuitListener;
 import com.mak001.ircBot.Bot;
-import com.mak001.ircBot.permissions.PermissionHandler;
 import com.mak001.ircBot.plugins.Permissions;
 import com.mak001.ircBot.plugins.RegularCommands;
 import com.mak001.ircBot.settings.Settings;
@@ -30,7 +29,6 @@ public class PluginManager {
 
 	private final Map<String, Plugin> plugins = new HashMap<String, Plugin>();
 	private final PluginLoader pluginLoader;
-	private final PermissionHandler permissionHandler;
 	private final CommandManager commandManager;
 	private final Bot bot;
 
@@ -47,9 +45,6 @@ public class PluginManager {
 	private final List<PrivateMessageListener> privateMessageListeners = new ArrayList<PrivateMessageListener>();
 	private final List<QuitListener> quitListeners = new ArrayList<QuitListener>();
 
-	public static final int CHANNEL_MODE_EVENT = 0, USER_MODE_EVENT = 1;
-	public static final int FINGER_EVENT = 0, PING_EVENT = 1, VERSION_EVENT = 1;
-
 	public PluginManager(Bot bot) {
 		this.bot = bot;
 		listeners.add(actionListeners);
@@ -65,7 +60,6 @@ public class PluginManager {
 
 		pluginLoader = new PluginLoader(bot, this);
 		commandManager = new CommandManager();
-		permissionHandler = new PermissionHandler(); // TODO - move to bot?
 	}
 
 	/**
@@ -205,11 +199,10 @@ public class PluginManager {
 		if (message.toUpperCase().startsWith("HELP")) {
 			String add = message.replaceFirst("(?i)HELP", "").replaceFirst(" ", "");
 			wasHelp = !onHelp(channel, sender, login, hostname, add);
-			// TODO
-		}
+		}// TODO - move the about and versions?
 		Command command = commandManager.getCommand(message);
 		if (command == null) return false;
-		if (permissionHandler.getUser(sender).hasPermission(command.getPermission())) {
+		if (bot.getPermissionHandler().getUser(sender).hasPermission(command.getPermission())) {
 			if (wasHelp) {
 				command.onHelp(channel, sender, login, hostname);
 				return true;
@@ -233,21 +226,19 @@ public class PluginManager {
 			return true;
 		} else {
 			String com = "";
-			if (message.startsWith(" ")) message = message.replaceFirst(" ", "").toUpperCase();
+			message = message.trim();
 			if (message.contains(" ")) {
 				com = message.split(" ")[0];
 			} else {
 				com = message;
 			}
-			System.out.println("looking for command \"" + com + "\"");
 			Plugin plugin = commandManager.getPluginByCommand(com);
 			if (plugin != null) {
 				bot.sendMessage(sender, "This will list every commands from " + plugin.getName());
-				List<Command> coms = commandManager.getCommands(plugin.getName());
-				System.out.println("are commands null? " + (coms == null));
-				System.out.println("are commands empty? " + coms.isEmpty());
-				for (Command c : coms) {
-					c.onHelp(channel, sender, login, hostname);
+				for (Command c : commandManager.getCommands(plugin.getName())) {
+					if (bot.getPermissionHandler().getUser(sender).hasPermission(c.getPermission())) {
+						c.onHelp(channel, sender, login, hostname);
+					}
 				}
 				return true;
 			} else {

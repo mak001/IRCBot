@@ -6,7 +6,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import com.mak001.ircBot.gui.SetUp;
-import com.mak001.ircBot.plugins.permissions.IRCPermissions;
 
 
 public class SettingsWriter {
@@ -51,22 +50,7 @@ public class SettingsWriter {
 
 			update();
 		}
-		if (!(file = new File(Settings.userHome + Settings.fileSeparator + "Settings" + Settings.fileSeparator
-				+ "groups.mak")).exists()) {
-			IRCPermissions.setUpGroups();
-
-		}
-		if (!(file = new File(Settings.userHome + Settings.fileSeparator + "Settings" + Settings.fileSeparator
-				+ "users.mak")).exists()) {
-			IRCPermissions.setUpUsers();
-		}
-
 		if (!(file = new File(Settings.userHome + Settings.fileSeparator + "Plugins")).exists()) {
-			file.mkdirs();
-		}
-
-		if (!(file = new File(Settings.userHome + Settings.fileSeparator + "Plugins" + Settings.fileSeparator + "bin"))
-				.exists()) {
 			file.mkdirs();
 		}
 

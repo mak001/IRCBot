@@ -45,6 +45,38 @@ public class PermissionHandler {
 	}
 
 	/**
+	 * Adds a permission node to a user
+	 * 
+	 * @param user
+	 *            - The user to add the permission to
+	 * @param permission
+	 *            - The permission node to add
+	 */
+	public void addPermission(String user, String permission) {
+		if (getUser(user).equals(DEFAULT_USER)) {
+			User u = new User(user);
+			u.addPermission(permission);
+			users.add(u);
+		} else {
+			getUser(user).addPermission(permission);
+		}
+	}
+
+	/**
+	 * Adds a permission node to a user
+	 * 
+	 * @param user
+	 *            - The user to add the permission to
+	 * @param permission
+	 *            - The permission node to add
+	 */
+	public void removePermission(String user, String permission) {
+		if (!getUser(user).equals(DEFAULT_USER)) {
+			getUser(user).removePermission(permission);
+		}
+	}
+
+	/**
 	 * Loads all the users from a file
 	 * 
 	 * @throws IOException

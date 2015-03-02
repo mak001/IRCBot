@@ -1,7 +1,5 @@
 package com.mak001.api.plugins;
 
-import com.mak001.ircBot.plugins.permissions.IRCPermissions;
-
 
 public class Command {
 
@@ -108,12 +106,7 @@ public class Command {
 	 *            - The host name of the sender of the command
 	 */
 	public void onCommand(String channel, String sender, String login, String hostname, String additional) {
-		if (IRCPermissions.hasPermission(sender, permission)) {
-			commandAction.onCommand(channel, sender, login, hostname, additional);
-		} else {
-			plugin.bot.sendMessage(sender, "You do not have permission to use this command : " + command[0]);
-			plugin.bot.sendMessage(sender, "requires permission : " + permission);
-		}
+		commandAction.onCommand(channel, sender, login, hostname, additional);
 	}
 
 	/**
@@ -131,9 +124,7 @@ public class Command {
 	 *            - The host name of the sender of the command
 	 */
 	public void onHelp(String channel, String sender, String login, String hostname) {
-		if (IRCPermissions.hasPermission(sender, permission)) {
 			commandAction.onHelp(channel, sender, login, hostname);
-		}
 	}
 
 	/**

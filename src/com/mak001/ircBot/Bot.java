@@ -5,10 +5,10 @@ import java.util.ArrayList;
 
 import org.jibble.pircbot.PircBot;
 
+import com.mak001.ircBot.permissions.PermissionHandler;
 import com.mak001.ircBot.plugin.PluginManager;
 import com.mak001.ircBot.plugins.Permissions;
 import com.mak001.ircBot.plugins.RegularCommands;
-import com.mak001.ircBot.plugins.permissions.IRCPermissions;
 import com.mak001.ircBot.settings.Settings;
 import com.mak001.ircBot.settings.SettingsWriter;
 
@@ -17,12 +17,14 @@ public class Bot extends PircBot {
 	private ArrayList<Channel> channels = new ArrayList<Channel>();
 	private boolean shouldDie = false;
 	private final PluginManager manager;
+	private final PermissionHandler permissionHandler;
 
 	public Bot() {
+		permissionHandler = new PermissionHandler();
 		manager = new PluginManager(this);
 		manager.addPlugin(new RegularCommands(this));
 		manager.addPlugin(new Permissions(this));
-		File folder = new File(Settings.userHome + Settings.fileSeparator + "Plugins" + Settings.fileSeparator + "bin");
+		File folder = new File(Settings.userHome + Settings.fileSeparator + "Plugins");
 		for (File file : folder.listFiles()) {
 			try {
 				String path = file.getCanonicalPath();
@@ -245,11 +247,7 @@ public class Bot extends PircBot {
 		return null;
 	}
 
-
-	public void createPermissionsUser(String user) {
-		if (IRCPermissions.getUser(user) == null) {
-			IRCPermissions.createUser(user);
-			IRCPermissions.save();
-		}
+	public PermissionHandler getPermissionHandler() {
+		return permissionHandler;
 	}
 }

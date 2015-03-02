@@ -8,7 +8,6 @@ import java.util.List;
 
 import com.mak001.ircBot.gui.GUI;
 import com.mak001.ircBot.gui.simple.SimpleGUI;
-import com.mak001.ircBot.plugins.permissions.IRCPermissions;
 import com.mak001.ircBot.settings.Settings;
 import com.mak001.ircBot.settings.SettingsWriter;
 
@@ -57,7 +56,6 @@ public class Boot {
 		Settings.fileSeparator = System.getProperty("file.separator");
 		Settings.userHome = System.getProperty("user.home") + Settings.fileSeparator + "IRCBot";
 		Settings.init();
-		IRCPermissions.load();
 
 		/*
 		 * Makes sure all settings are loaded/generated before saving data
@@ -67,7 +65,11 @@ public class Boot {
 			@Override
 			public void run() {
 				SettingsWriter.update();
-				IRCPermissions.save();
+				try {
+					bot.getPermissionHandler().save();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}));
 	}

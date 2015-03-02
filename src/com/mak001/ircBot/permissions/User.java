@@ -31,6 +31,11 @@ public class User {
 		if (permissions.contains(permission)) return false;
 		return permissions.add(permission);
 	}
+	
+	public boolean removePermission(String permission) {
+		if (permissions.contains(permission)) return false;
+		return permissions.remove(permission);
+	}
 
 	public boolean hasPermission(String permission) {
 		if (permission == null || permission.equals("")) return true;
@@ -54,5 +59,4 @@ public class User {
 		if (o instanceof User) if (((User) o).getName().equalsIgnoreCase(name)) return true;
 		return false;
 	}
-
 }
