@@ -80,7 +80,7 @@ public class CommandManager {
 		for (String string : command.getCommand()) {
 			if (message.endsWith(" ")) message = message.trim();
 			if (message.equalsIgnoreCase(string)) return "";
-			message.replaceFirst("(?i)" + string, "");
+			message = message.replaceFirst("(?i)" + string, "").trim();
 		}
 		return message;
 	}
