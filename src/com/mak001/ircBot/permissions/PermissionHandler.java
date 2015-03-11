@@ -1,4 +1,4 @@
-package com.mak001.ircBot.permissions;
+package com.mak001.ircbot.permissions;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -12,15 +12,14 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.mak001.ircBot.settings.Settings;
+import com.mak001.ircbot.SettingsManager;
 
 // TODO - make permissions be able to take wild cards
 public class PermissionHandler {
 
 	private final List<User> users = new ArrayList<User>();
 	private final static String USERS = "USERS";
-	private static final String USER_FILE_STRING = Settings.userHome + Settings.fileSeparator + "Settings"
-			+ Settings.fileSeparator + "user.json";
+	private static final String USER_FILE_STRING = SettingsManager.settingsFolder + "user.json";
 	private static final File USER_FILE = new File(USER_FILE_STRING);
 
 	private final User DEFAULT_USER = new User("default");

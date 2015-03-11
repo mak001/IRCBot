@@ -1,4 +1,4 @@
-package com.mak001.ircBot;
+package com.mak001.ircbot;
 
 import java.util.ArrayList;
 

@@ -1,12 +1,12 @@
-package com.mak001.ircBot.plugins;
+package com.mak001.ircbot.plugins;
 
 import com.mak001.api.plugins.Command;
 import com.mak001.api.plugins.Command.CommandAction;
 import com.mak001.api.plugins.Manifest;
 import com.mak001.api.plugins.Plugin;
-import com.mak001.ircBot.Bot;
-import com.mak001.ircBot.plugin.InvalidPluginException;
-import com.mak001.ircBot.settings.Settings;
+import com.mak001.ircbot.Boot;
+import com.mak001.ircbot.Bot;
+import com.mak001.ircbot.plugin.InvalidPluginException;
 
 @Manifest(authors = { "mak001" }, name = "Default commands", version = 1.0, description = "The default commands that came with the bot (not including the permission commands)")
 public class RegularCommands extends Plugin {
@@ -14,7 +14,7 @@ public class RegularCommands extends Plugin {
 	private final String admin = "main.admin";
 	private final String plugins = "main.plugins";
 	private final String shutdown_node = "main.shutdown";
-	private String prefix = Settings.get(Settings.COMMAND_PREFIX);
+	private String prefix = Boot.getSettingsManager().getCommandPrefix();
 
 	public RegularCommands(Bot bot) {
 		super(bot, "CMD");
@@ -124,11 +124,11 @@ public class RegularCommands extends Plugin {
 		public void onCommand(String channel, String sender, String login, String hostname, String additional) {
 			String[] command_array = additional.split(" ");
 			if (command_array[0].equalsIgnoreCase("NICK")) {
-				Settings.put(Settings.NICK, command_array[1], true);
+				Boot.getSettingsManager().changeNick(command_array[1]);
 				bot.changeNick(command_array[1]);
 
 			} else if (command_array[0].equalsIgnoreCase("COMMAND_PREFIX")) {
-				Settings.put(Settings.COMMAND_PREFIX, command_array[1], true);
+				Boot.getSettingsManager().changeCommandPrefix(command_array[1]);
 
 			}
 		}

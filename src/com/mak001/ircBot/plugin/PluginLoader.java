@@ -1,4 +1,4 @@
-package com.mak001.ircBot.plugin;
+package com.mak001.ircbot.plugin;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,8 +15,8 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import com.mak001.api.plugins.Plugin;
-import com.mak001.ircBot.Boot;
-import com.mak001.ircBot.Bot;
+import com.mak001.ircbot.Boot;
+import com.mak001.ircbot.Bot;
 
 
 public class PluginLoader {

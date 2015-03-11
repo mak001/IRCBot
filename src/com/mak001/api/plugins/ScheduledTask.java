@@ -2,7 +2,7 @@ package com.mak001.api.plugins;
 
 import java.util.TimerTask;
 
-import com.mak001.ircBot.ScheduledTaskHandler;
+import com.mak001.ircbot.ScheduledTaskHandler;
 
 /**
  * Allows the bot to have scheduled tasks. Better than having multiple, wasteful

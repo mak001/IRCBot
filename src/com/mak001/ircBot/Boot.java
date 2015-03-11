@@ -1,4 +1,4 @@
-package com.mak001.ircBot;
+package com.mak001.ircbot;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -6,10 +6,8 @@ import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.List;
 
-import com.mak001.ircBot.gui.GUI;
-import com.mak001.ircBot.gui.simple.SimpleGUI;
-import com.mak001.ircBot.settings.Settings;
-import com.mak001.ircBot.settings.SettingsWriter;
+import com.mak001.ircbot.gui.GUI;
+import com.mak001.ircbot.gui.simple.SimpleGUI;
 
 public class Boot {
 
@@ -20,8 +18,10 @@ public class Boot {
 	private static GUI gui;
 
 	private static SimpleGUI simpleGUI;
+	private static SettingsManager settings;
 
 	public static void main(String[] argsList) throws Exception {
+		settings = new SettingsManager();
 		List<String> args = Arrays.asList(argsList);
 
 		if (!args.contains("-gui") && !args.contains("simpleGUI")) {
@@ -37,7 +37,7 @@ public class Boot {
 		}
 		setUp();
 
-		SERVER = Settings.get(Settings.SERVER);
+		SERVER = settings.getServer();
 
 		// Now start our bot up.
 		bot = new Bot();
@@ -52,11 +52,6 @@ public class Boot {
 
 
 	private static void setUp() {
-		Settings.lineSeparator = System.getProperty("line.separator");
-		Settings.fileSeparator = System.getProperty("file.separator");
-		Settings.userHome = System.getProperty("user.home") + Settings.fileSeparator + "IRCBot";
-		Settings.init();
-
 		/*
 		 * Makes sure all settings are loaded/generated before saving data
 		 */
@@ -64,7 +59,6 @@ public class Boot {
 
 			@Override
 			public void run() {
-				SettingsWriter.update();
 				try {
 					bot.getPermissionHandler().save();
 				} catch (IOException e) {
@@ -133,6 +127,11 @@ public class Boot {
 		if (simpleGUI != null) {
 			simpleGUI.dispose();
 		}
+	}
+
+
+	public static SettingsManager getSettingsManager() {
+		return settings;
 	}
 
 }

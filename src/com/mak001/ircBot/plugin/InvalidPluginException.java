@@ -1,4 +1,4 @@
-package com.mak001.ircBot.plugin;
+package com.mak001.ircbot.plugin;
 
 /**
  * Thrown when attempting to load an invalid Plugin file

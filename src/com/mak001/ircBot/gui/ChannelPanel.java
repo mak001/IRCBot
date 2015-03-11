@@ -1,4 +1,4 @@
-package com.mak001.ircBot.gui;
+package com.mak001.ircbot.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,8 +15,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JList;
 import javax.swing.JEditorPane;
 
-import com.mak001.ircBot.Boot;
-import com.mak001.ircBot.Channel;
+import com.mak001.ircbot.Boot;
+import com.mak001.ircbot.Channel;
 
 
 public class ChannelPanel extends JPanel {

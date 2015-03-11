@@ -1,4 +1,4 @@
-package com.mak001.ircBot.permissions;
+package com.mak001.ircbot.permissions;
 
 import java.util.ArrayList;
 import java.util.List;

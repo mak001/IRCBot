@@ -1,4 +1,4 @@
-package com.mak001.ircBot.gui;
+package com.mak001.ircbot.gui;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;

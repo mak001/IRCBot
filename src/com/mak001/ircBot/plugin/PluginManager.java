@@ -1,4 +1,4 @@
-package com.mak001.ircBot.plugin;
+package com.mak001.ircbot.plugin;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -20,10 +20,10 @@ import com.mak001.api.plugins.listeners.NoticeListener;
 import com.mak001.api.plugins.listeners.PartListener;
 import com.mak001.api.plugins.listeners.PrivateMessageListener;
 import com.mak001.api.plugins.listeners.QuitListener;
-import com.mak001.ircBot.Bot;
-import com.mak001.ircBot.plugins.Permissions;
-import com.mak001.ircBot.plugins.RegularCommands;
-import com.mak001.ircBot.settings.Settings;
+import com.mak001.ircbot.Boot;
+import com.mak001.ircbot.Bot;
+import com.mak001.ircbot.plugins.Permissions;
+import com.mak001.ircbot.plugins.RegularCommands;
 
 public class PluginManager {
 
@@ -216,7 +216,8 @@ public class PluginManager {
 
 	private boolean onHelp(String channel, String sender, String login, String hostname, String message) {
 		if (message.equals("") || message.replace(" ", "").equals("")) {
-			bot.sendMessage(sender, "This will list every plugin command, use " + Settings.get(Settings.COMMAND_PREFIX)
+			bot.sendMessage(sender, "This will list every plugin command, use "
+					+ Boot.getSettingsManager().getCommandPrefix()
 					+ "HELP <PLUGIN COMMAND>   for more help with an individual plugin.");
 			for (Plugin p : getPlugins()) {
 				String name = p.getManifest().name();

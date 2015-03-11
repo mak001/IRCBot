@@ -1,4 +1,4 @@
-package com.mak001.ircBot.plugin;
+package com.mak001.ircbot.plugin;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -1,4 +1,4 @@
-package com.mak001.ircBot.gui.simple;
+package com.mak001.ircbot.gui.simple;
 
 import java.awt.BorderLayout;
 

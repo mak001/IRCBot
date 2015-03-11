@@ -1,4 +1,4 @@
-package com.mak001.ircBot.gui.ui;
+package com.mak001.ircbot.gui.ui;
 
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicArrowButton;

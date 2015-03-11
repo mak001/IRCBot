@@ -1,6 +1,6 @@
 package com.mak001.api.plugins;
 
-import com.mak001.ircBot.Bot;
+import com.mak001.ircbot.Bot;
 
 /**
  * All plugins must extend this class and have a {@link Manifest} A plugin will
