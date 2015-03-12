@@ -6,15 +6,15 @@ import com.mak001.api.plugins.Command;
 import com.mak001.api.plugins.Command.CommandAction;
 import com.mak001.api.plugins.Manifest;
 import com.mak001.api.plugins.Plugin;
-import com.mak001.ircbot.Boot;
 import com.mak001.ircbot.Bot;
+import com.mak001.ircbot.SettingsManager;
 
 @Manifest(authors = { "mak001" }, name = "Permissions", version = 1.0, description = "Manage what people can and cannot use, you can also have exceptions.")
 public class Permissions extends Plugin {
 
 	private final String add = "perms.add";
 	private final String remove = "perms.remove";
-	private String prefix = Boot.getSettingsManager().getCommandPrefix();
+	private String prefix = SettingsManager.getCommandPrefix();
 
 	public Permissions(Bot bot) {
 		super(bot, "PEX");

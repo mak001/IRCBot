@@ -18,10 +18,9 @@ public class Boot {
 	private static GUI gui;
 
 	private static SimpleGUI simpleGUI;
-	private static SettingsManager settings;
 
 	public static void main(String[] argsList) throws Exception {
-		settings = new SettingsManager();
+		SettingsManager.load();
 		List<String> args = Arrays.asList(argsList);
 
 		if (!args.contains("-gui") && !args.contains("simpleGUI")) {
@@ -37,7 +36,7 @@ public class Boot {
 		}
 		setUp();
 
-		SERVER = settings.getServer();
+		SERVER = SettingsManager.getServer();
 
 		// Now start our bot up.
 		bot = new Bot();
@@ -128,10 +127,4 @@ public class Boot {
 			simpleGUI.dispose();
 		}
 	}
-
-
-	public static SettingsManager getSettingsManager() {
-		return settings;
-	}
-
 }

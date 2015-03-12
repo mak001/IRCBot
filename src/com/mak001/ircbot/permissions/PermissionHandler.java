@@ -19,7 +19,7 @@ public class PermissionHandler {
 
 	private final List<User> users = new ArrayList<User>();
 	private final static String USERS = "USERS";
-	private static final String USER_FILE_STRING = SettingsManager.settingsFolder + "user.json";
+	private static final String USER_FILE_STRING = SettingsManager.SETTINGS_FOLDER + "user.json";
 	private static final File USER_FILE = new File(USER_FILE_STRING);
 
 	private final User DEFAULT_USER = new User("default");

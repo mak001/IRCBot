@@ -24,7 +24,7 @@ public class Bot extends PircBot {
 		manager = new PluginManager(this);
 		manager.addPlugin(new RegularCommands(this));
 		manager.addPlugin(new Permissions(this));
-		File folder = new File(SettingsManager.userHome + SettingsManager.fileSeparator + "Plugins");
+		File folder = new File(SettingsManager.BOT_HOME + SettingsManager.FILE_SEPERATOR + "Plugins");
 		for (File file : folder.listFiles()) {
 			try {
 				String path = file.getCanonicalPath();
@@ -35,14 +35,14 @@ public class Bot extends PircBot {
 				e.printStackTrace();
 			}
 		}
-		setName(Boot.getSettingsManager().getNick());
+		setName(SettingsManager.getNick());
 		setVersion("mak001's bot (Based off of Pirc)");
 	}
 
 	@Override
 	protected void onConnect() {
 		ident();
-		for (Entry<String, String> chan : Boot.getSettingsManager().getChannels().entrySet()) {
+		for (Entry<String, String> chan : SettingsManager.getChannels().entrySet()) {
 			if (chan.getValue() == null || chan.getValue().isEmpty()) this.joinChannel(chan.getKey());
 			this.joinChannel(chan.getKey(), chan.getValue());
 		}
@@ -68,7 +68,7 @@ public class Bot extends PircBot {
 	@Override
 	public void onMessage(String channel, String sender, String login, String hostname, String message) {
 		if (isCommand(message)) {
-			String s = message.replace(Boot.getSettingsManager().getCommandPrefix(), "");
+			String s = message.replace(SettingsManager.getCommandPrefix(), "");
 			manager.onCommand(channel, sender, login, hostname, s);
 		} else {
 			manager.triggerMessageListeners(channel, sender, login, hostname, message);
@@ -78,7 +78,7 @@ public class Bot extends PircBot {
 	@Override
 	public void onPrivateMessage(String sender, String login, String hostname, String message) {
 		if (isCommand(message)) {
-			String s = message.replace(Boot.getSettingsManager().getCommandPrefix(), "");
+			String s = message.replace(SettingsManager.getCommandPrefix(), "");
 			manager.onCommand(sender, sender, login, hostname, s);
 		} else {
 			manager.triggerPrivateMessageListeners(sender, login, hostname, message);
@@ -191,7 +191,7 @@ public class Bot extends PircBot {
 	}
 
 	private boolean isCommand(String message) {
-		return message.substring(0, 1).equals(Boot.getSettingsManager().getCommandPrefix());
+		return message.substring(0, 1).equals(SettingsManager.getCommandPrefix());
 	}
 
 
@@ -199,7 +199,7 @@ public class Bot extends PircBot {
 		shouldDie = true;
 		this.quitServer("Requested by: " + sender);
 		try {
-			Boot.getSettingsManager().save();
+			SettingsManager.save();
 			permissionHandler.save();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -213,8 +213,8 @@ public class Bot extends PircBot {
 	}
 
 	private void ident() {
-		String pass = Boot.getSettingsManager().getNickPass();
-		String nick = Boot.getSettingsManager().getNick();
+		String pass = SettingsManager.getNickPass();
+		String nick = SettingsManager.getNick();
 		if (!getNick().equals(nick) && !getNick().equals("PircBot")) {
 			sendMessage("Nickserv", "ghost " + nick + " " + pass);
 			changeNick(nick);
@@ -226,7 +226,7 @@ public class Bot extends PircBot {
 
 
 	public void addChannel(String chan) {
-		Boot.getSettingsManager().addChannel(chan);
+		SettingsManager.addChannel(chan);
 	}
 
 	public void removeChannel(String chan) {
@@ -234,7 +234,7 @@ public class Bot extends PircBot {
 	}
 
 	public void removeChannel(String chan, String reason) {
-		Boot.getSettingsManager().removeChannel(chan);
+		SettingsManager.removeChannel(chan);
 		partChannel(chan, reason);
 		channels.remove(chan);
 	}

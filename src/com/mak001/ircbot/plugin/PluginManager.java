@@ -20,8 +20,8 @@ import com.mak001.api.plugins.listeners.NoticeListener;
 import com.mak001.api.plugins.listeners.PartListener;
 import com.mak001.api.plugins.listeners.PrivateMessageListener;
 import com.mak001.api.plugins.listeners.QuitListener;
-import com.mak001.ircbot.Boot;
 import com.mak001.ircbot.Bot;
+import com.mak001.ircbot.SettingsManager;
 import com.mak001.ircbot.plugins.Permissions;
 import com.mak001.ircbot.plugins.RegularCommands;
 
@@ -216,8 +216,7 @@ public class PluginManager {
 
 	private boolean onHelp(String channel, String sender, String login, String hostname, String message) {
 		if (message.equals("") || message.replace(" ", "").equals("")) {
-			bot.sendMessage(sender, "This will list every plugin command, use "
-					+ Boot.getSettingsManager().getCommandPrefix()
+			bot.sendMessage(sender, "This will list every plugin command, use " + SettingsManager.getCommandPrefix()
 					+ "HELP <PLUGIN COMMAND>   for more help with an individual plugin.");
 			for (Plugin p : getPlugins()) {
 				String name = p.getManifest().name();

@@ -20,48 +20,37 @@ import com.mak001.ircbot.gui.SetUp;
  * @author Mak001
  * 
  */
-public class SettingsManager {
+public final class SettingsManager {
 
-	public static String lineSeparator, fileSeparator, userHome, settingsFolder;
+	public static final String LINE_SEPERATOR = System.getProperty("line.separator");
+	public static final String FILE_SEPERATOR = System.getProperty("file.separator");
+	public static final String BOT_HOME = System.getProperty("user.home") + FILE_SEPERATOR + "IRCBot";
+	public static final String SETTINGS_FOLDER = BOT_HOME + FILE_SEPERATOR + "Settings" + FILE_SEPERATOR;
 
-	private static String USER_NAME = "USER NAME";
-	private static String USER_PASS = "USER PASS";
-	private static String COMMAND_PREFIX = "COMMAND PREFIX";
-	private static String NETWORK = "NETWORK";
-	private static String CHANNELS = "CHANNELS";
-	private static String CHANNEL_NAME = "NAME";
-	private static String CHANNEL_PASS = "PASS";
+	private static final String USER_NAME = "USER NAME";
+	private static final String USER_PASS = "USER PASS";
+	private static final String COMMAND_PREFIX = "COMMAND PREFIX";
+	private static final String NETWORK = "NETWORK";
+	private static final String CHANNELS = "CHANNELS";
+	private static final String CHANNEL_NAME = "NAME";
+	private static final String CHANNEL_PASS = "PASS";
 
-	private String u_name;
-	private String u_pass;
-	private String prefix;
-	private String network;
-	private HashMap<String, String> channels = new HashMap<String, String>();
+	private static final String SETTINGS_FILE_STRING = SETTINGS_FOLDER + "settings.json";
+	private static final File SETTINGS_FILE = new File(SETTINGS_FILE_STRING);
 
-	private static String SETTINGS_FILE_STRING;
-	private static File SETTINGS_FILE;
 
-	public SettingsManager() {
-		lineSeparator = System.getProperty("line.separator");
-		fileSeparator = System.getProperty("file.separator");
-		userHome = System.getProperty("user.home") + fileSeparator + "IRCBot";
-		settingsFolder = userHome + fileSeparator + "Settings" + fileSeparator;
-		SETTINGS_FILE_STRING = settingsFolder + "settings.json";
-		SETTINGS_FILE = new File(SETTINGS_FILE_STRING);
-
-		try {
-			load();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+	private static String u_name;
+	private static String u_pass;
+	private static String prefix;
+	private static String network;
+	private static HashMap<String, String> channels = new HashMap<String, String>();
 
 	/**
 	 * Loads the settings
 	 * 
 	 * @throws IOException
 	 */
-	private void load() throws IOException {
+	public static void load() throws IOException {
 		if (SETTINGS_FILE.exists()) {
 			JSONObject obj = new JSONObject(getFileText(SETTINGS_FILE));
 			u_name = obj.getString(USER_NAME);
@@ -81,7 +70,7 @@ public class SettingsManager {
 		}
 	}
 
-	private String getFileText(File file) throws IOException {
+	private static String getFileText(File file) throws IOException {
 		StringBuilder response = new StringBuilder();
 		BufferedReader input = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
 		String strLine = null;
@@ -97,7 +86,7 @@ public class SettingsManager {
 	 * 
 	 * @throws IOException
 	 */
-	public void genDefault() throws IOException {
+	public static void genDefault() throws IOException {
 		// TODO
 
 		new Thread(new Runnable() {
@@ -130,7 +119,7 @@ public class SettingsManager {
 	 * 
 	 * @throws IOException
 	 */
-	public void save() throws IOException {
+	public static void save() throws IOException {
 		Bot bot = Boot.getBot();
 
 		JSONObject obj = new JSONObject();
@@ -163,27 +152,27 @@ public class SettingsManager {
 		writer.close();
 	}
 
-	public String getServer() {
+	public static String getServer() {
 		return network;
 	}
 
-	public String getCommandPrefix() {
+	public static String getCommandPrefix() {
 		return prefix;
 	}
 
-	public String getNick() {
+	public static String getNick() {
 		return u_name;
 	}
 
-	public String getNickPass() {
+	public static String getNickPass() {
 		return u_pass;
 	}
 
-	public HashMap<String, String> getChannels() {
+	public static HashMap<String, String> getChannels() {
 		return channels;
 	}
 
-	public void addChannel(String chan) {
+	public static void addChannel(String chan) {
 		channels.put(chan, "");
 		try {
 			save();
@@ -192,7 +181,7 @@ public class SettingsManager {
 		}
 	}
 
-	public void removeChannel(String chan) {
+	public static void removeChannel(String chan) {
 		channels.remove(chan);
 		try {
 			save();
@@ -201,7 +190,7 @@ public class SettingsManager {
 		}
 	}
 
-	public void changeNick(String nick) {
+	public static void changeNick(String nick) {
 		u_name = nick;
 		try {
 			save();
@@ -210,8 +199,8 @@ public class SettingsManager {
 		}
 	}
 
-	public void changeCommandPrefix(String prefix) {
-		this.prefix = prefix;
+	public static void changeCommandPrefix(String _prefix) {
+		prefix = _prefix;
 		try {
 			save();
 		} catch (IOException e) {
