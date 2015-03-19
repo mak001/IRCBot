@@ -31,9 +31,6 @@ import java.util.List;
 public class User {
 
 	private List<String> permissions;
-	private List<String> exceptions;
-	private List<String> allPermissions;
-	private String group;
 	private String _prefix;
 	private String _nick;
 	private String _lowerNick;
@@ -49,25 +46,16 @@ public class User {
 	 *            The nick of the user.
 	 */
 	User(String prefix, String nick) {
-		this(prefix, nick, null, null, null);
+		this(prefix, nick, null);
 	}
 
-	public User(String prefix, String nick, String group, List<String> permissions, ArrayList<String> exceptions) {
+	public User(String prefix, String nick, List<String> permissions) {
 		if (permissions == null) permissions = new ArrayList<String>();
-		if (exceptions == null) exceptions = new ArrayList<String>();
-		if (group == null || group.isEmpty()) {
-			// group = IRCPermissions.getDefaultGroup();
-		}
-
 		_prefix = prefix;
 		_nick = nick;
 		_lowerNick = nick.toLowerCase();
-
 		this.permissions = permissions;
-		this.group = group;
-		this.exceptions = exceptions;
 		// TODO
-
 	}
 
 
@@ -219,23 +207,7 @@ public class User {
 	}
 
 	public List<String> getPermissions() {
-		return allPermissions;
-	}
-
-	public List<String> getPermissionsWithoutExceptions() {
 		return permissions;
-	}
-
-	public List<String> getExceptions() {
-		return exceptions;
-	}
-
-	public String getGroup() {
-		return group;
-	}
-
-	public void setGroup(String group) {
-		this.group = group;
 	}
 
 	public void addPermission(String permission) {
@@ -243,10 +215,7 @@ public class User {
 	}
 
 	public void removePermission(String permission) {
-		// if
-		// (IRCPermissions.getGroup(group).getPermissions().contains(permission))
-		// exceptions.add(permission);
-		// permissions.remove(permission);
+		permissions.remove(permission);
 	}
 
 	public enum Modes

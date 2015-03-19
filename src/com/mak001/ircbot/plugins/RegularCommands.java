@@ -61,9 +61,9 @@ public class RegularCommands extends Plugin {
 		public void onCommand(String channel, String sender, String login, String hostname, String additional) {
 			if (!additional.contains(" ")) {
 				if (isChannel(additional)) {
-					// bot.addChannel(additional);
-				} else { // TODO
-					// bot.addChannel("#" + additional);
+					bot.addChannel(additional);
+				} else {
+					bot.addChannel("#" + additional);
 				}
 			} else {
 				bot.sendMessage(sender, additional + " is not a valid channel");
@@ -82,12 +82,12 @@ public class RegularCommands extends Plugin {
 		public void onCommand(String channel, String sender, String login, String hostname, String additional) {
 			if (additional != null && additional.equals("") && channel != null && !channel.equals("")) {
 				// bot.removeChannel(channel);
-			}
+			}// TODO?
 			if (!additional.contains(" ")) {
 				if (isChannel(additional)) {
-					// bot.removeChannel(additional);
-				} else { // TODO
-					// bot.removeChannel("#" + additional);
+					bot.removeChannel(additional);
+				} else {
+					bot.removeChannel("#" + additional);
 				}
 			} else {
 				bot.sendMessage(sender, additional + " is not a valid channel");

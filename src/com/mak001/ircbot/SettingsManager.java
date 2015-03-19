@@ -120,7 +120,6 @@ public final class SettingsManager {
 	 * @throws IOException
 	 */
 	public static void save() throws IOException {
-		Bot bot = Boot.getBot();
 
 		JSONObject obj = new JSONObject();
 		obj.put(COMMAND_PREFIX, prefix);
@@ -129,21 +128,12 @@ public final class SettingsManager {
 		obj.put(NETWORK, network);
 
 		JSONArray chans = new JSONArray();
-		if (bot == null || bot.getChannels() == null) {
-			for (Entry<String, String> entry : channels.entrySet()) {
-				JSONObject chan = new JSONObject();
-				chan.put(CHANNEL_NAME, entry.getKey());
-				chan.put(CHANNEL_PASS, entry.getValue());
-				chans.put(chan);
-			}
-		} else {
-			for (String c : bot.getChannels()) {
-				// TODO - redo after bot stores channel objects
-				JSONObject chan = new JSONObject();
-				chan.put(CHANNEL_NAME, c);
-				chan.put(CHANNEL_PASS, "");
-				chans.put(chan);
-			}
+
+		for (Entry<String, String> entry : channels.entrySet()) {
+			JSONObject chan = new JSONObject();
+			chan.put(CHANNEL_NAME, entry.getKey());
+			chan.put(CHANNEL_PASS, entry.getValue());
+			chans.put(chan);
 		}
 		obj.put(CHANNELS, chans);
 

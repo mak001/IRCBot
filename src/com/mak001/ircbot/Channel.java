@@ -10,7 +10,7 @@ public class Channel {
 
 	public Channel(String name, Bot bot) {
 		this.name = name;
-		bot.setMode(name, "");
+		//bot.setMode(name, "");
 	}
 
 	public String getName() {

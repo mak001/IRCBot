@@ -226,6 +226,8 @@ public class Bot extends PircBot {
 
 
 	public void addChannel(String chan) {
+		this.joinChannel(chan);
+		channels.add(new Channel(chan, this));
 		SettingsManager.addChannel(chan);
 	}
 
@@ -234,9 +236,9 @@ public class Bot extends PircBot {
 	}
 
 	public void removeChannel(String chan, String reason) {
-		SettingsManager.removeChannel(chan);
 		partChannel(chan, reason);
 		channels.remove(chan);
+		SettingsManager.removeChannel(chan);
 	}
 
 	public Channel getChannelByName(String chan) {
