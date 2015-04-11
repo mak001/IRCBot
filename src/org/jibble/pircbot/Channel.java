@@ -24,32 +24,39 @@ public class Channel {
 		return _users.get(name);
 	}
 
-	public boolean changeUserName(String oldNick, String newNick) {
+	public User changeUserName(String oldNick, String newNick) {
 		if (_users.containsKey(oldNick)) {
-			return _users.put(newNick, _users.remove(oldNick)) != null;
+			return _users.put(newNick, _users.remove(oldNick));
 		}
-		return false;
+		return null;
 	}
 
-	public boolean removeUserByName(String nick) {
-		return _users.remove(nick) != null;
+	public User removeUserByName(String nick) {
+		return _users.remove(nick) ;
 	}
 
-	public boolean removeUser(User user) {
+	public User removeUser(User user) {
 		return removeUserByName(user.getNick());
 	}
 
-
-	public boolean addUserByName(String prefix, String nick) {
-		return _users.put(nick, new User(prefix, nick)) != null;
+	public User addUserByName(String nick) {
+		return _users.put(nick, new User(nick)) ;
 	}
 
-	public boolean addUser(User user) {
-		return _users.put(user.getNick(), user) != null;
+	public User addUserByName(String prefix, String nick) {
+		return _users.put(nick, new User(prefix, nick)) ;
+	}
+
+	public User addUser(User user) {
+		return _users.put(user.getNick(), user);
 	}
 
 	public Collection<User> getUsers() {
 		return _users.values();
+	}
+	
+	public HashMap<String, User> getUserMap(){
+		return _users;
 	}
 
 	@Override

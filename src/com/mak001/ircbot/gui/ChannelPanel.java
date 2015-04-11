@@ -15,8 +15,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JList;
 import javax.swing.JEditorPane;
 
+import org.jibble.pircbot.Channel;
+
 import com.mak001.ircbot.Boot;
-import com.mak001.ircbot.Channel;
 
 
 public class ChannelPanel extends JPanel {
@@ -62,84 +63,46 @@ public class ChannelPanel extends JPanel {
 
 		JScrollPane scrollPane_1 = new JScrollPane();
 		GroupLayout groupLayout = new GroupLayout(this);
-		groupLayout
-				.setHorizontalGroup(groupLayout
-						.createParallelGroup(Alignment.LEADING)
+		groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(
+				Alignment.TRAILING,
+				groupLayout
+						.createSequentialGroup()
+						.addContainerGap()
 						.addGroup(
-								Alignment.TRAILING,
 								groupLayout
-										.createSequentialGroup()
-										.addContainerGap()
+										.createParallelGroup(Alignment.TRAILING)
 										.addGroup(
 												groupLayout
-														.createParallelGroup(
-																Alignment.TRAILING)
-														.addGroup(
-																groupLayout
-																		.createSequentialGroup()
-																		.addComponent(
-																				scrollPane_1,
-																				GroupLayout.DEFAULT_SIZE,
-																				502,
-																				Short.MAX_VALUE)
-																		.addPreferredGap(
-																				ComponentPlacement.RELATED)
-																		.addComponent(
-																				scrollPane,
-																				GroupLayout.PREFERRED_SIZE,
-																				143,
-																				GroupLayout.PREFERRED_SIZE))
-														.addGroup(
-																groupLayout
-																		.createSequentialGroup()
-																		.addComponent(
-																				textField,
-																				GroupLayout.DEFAULT_SIZE,
-																				567,
-																				Short.MAX_VALUE)
-																		.addPreferredGap(
-																				ComponentPlacement.RELATED)
-																		.addComponent(
-																				btnSend,
-																				GroupLayout.PREFERRED_SIZE,
-																				78,
-																				GroupLayout.PREFERRED_SIZE)))
-										.addContainerGap()));
-		groupLayout
-				.setVerticalGroup(groupLayout
-						.createParallelGroup(Alignment.LEADING)
-						.addGroup(
-								Alignment.TRAILING,
-								groupLayout
-										.createSequentialGroup()
-										.addContainerGap()
-										.addGroup(
-												groupLayout
-														.createParallelGroup(
-																Alignment.LEADING)
-														.addComponent(
-																scrollPane_1,
-																GroupLayout.DEFAULT_SIZE,
-																249,
+														.createSequentialGroup()
+														.addComponent(scrollPane_1, GroupLayout.DEFAULT_SIZE, 502,
 																Short.MAX_VALUE)
-														.addComponent(
-																scrollPane,
-																GroupLayout.DEFAULT_SIZE,
-																249,
-																Short.MAX_VALUE))
-										.addPreferredGap(
-												ComponentPlacement.RELATED)
+														.addPreferredGap(ComponentPlacement.RELATED)
+														.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 143,
+																GroupLayout.PREFERRED_SIZE))
 										.addGroup(
 												groupLayout
-														.createParallelGroup(
-																Alignment.BASELINE)
-														.addComponent(btnSend)
-														.addComponent(
-																textField,
-																GroupLayout.PREFERRED_SIZE,
-																GroupLayout.DEFAULT_SIZE,
-																GroupLayout.PREFERRED_SIZE))
-										.addContainerGap()));
+														.createSequentialGroup()
+														.addComponent(textField, GroupLayout.DEFAULT_SIZE, 567,
+																Short.MAX_VALUE)
+														.addPreferredGap(ComponentPlacement.RELATED)
+														.addComponent(btnSend, GroupLayout.PREFERRED_SIZE, 78,
+																GroupLayout.PREFERRED_SIZE))).addContainerGap()));
+		groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(
+				Alignment.TRAILING,
+				groupLayout
+						.createSequentialGroup()
+						.addContainerGap()
+						.addGroup(
+								groupLayout.createParallelGroup(Alignment.LEADING)
+										.addComponent(scrollPane_1, GroupLayout.DEFAULT_SIZE, 249, Short.MAX_VALUE)
+										.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 249, Short.MAX_VALUE))
+						.addPreferredGap(ComponentPlacement.RELATED)
+						.addGroup(
+								groupLayout
+										.createParallelGroup(Alignment.BASELINE)
+										.addComponent(btnSend)
+										.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+												GroupLayout.PREFERRED_SIZE)).addContainerGap()));
 
 		editorPane = new JEditorPane();
 		scrollPane_1.setViewportView(editorPane);
@@ -166,8 +129,7 @@ public class ChannelPanel extends JPanel {
 	}
 
 	private void sendMessage() {
-		if (!textField.getText().equals("")) Boot.getBot().sendMessage(
-				channel.getName(), textField.getText());
+		if (!textField.getText().equals("")) Boot.getBot().sendMessage(channel.getName(), textField.getText());
 		textField.setText("");
 	}
 

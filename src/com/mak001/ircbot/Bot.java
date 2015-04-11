@@ -2,9 +2,9 @@ package com.mak001.ircbot;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Map.Entry;
 
+import org.jibble.pircbot.Channel;
 import org.jibble.pircbot.PircBot;
 
 import com.mak001.ircbot.permissions.PermissionHandler;
@@ -14,7 +14,6 @@ import com.mak001.ircbot.plugins.RegularCommands;
 
 public class Bot extends PircBot {
 
-	private ArrayList<Channel> channels = new ArrayList<Channel>();
 	private boolean shouldDie = false;
 	private final PluginManager manager;
 	private final PermissionHandler permissionHandler;
@@ -50,7 +49,6 @@ public class Bot extends PircBot {
 
 	@Override
 	protected void onDisconnect() {
-		channels.clear(); // clears the channels
 		try {
 			while (!isConnected() && !shouldDie) {
 				try {
@@ -115,7 +113,6 @@ public class Bot extends PircBot {
 			String recipientNick, String reason) {
 		// TODO - add in ban-handling
 		if (this.getNick().equalsIgnoreCase(recipientNick)) {
-			channels.remove(getChannelByName(channel));
 			joinChannel(channel);
 		}
 	}
@@ -177,16 +174,13 @@ public class Bot extends PircBot {
 			String[] parts = response.split(" ");
 			Channel chan = getChannelByName(parts[1]);
 			String modes = parts[2];
-			if (channels.contains(chan)) {
+			if (this.getChannels().containsKey(chan)) {
 				if (modes.startsWith("+")) {
 					chan.addModes(modes);
 				} else {
 					chan.removeModes(modes);
 				}
 			}
-			Channel chann = new Channel(parts[1], null);
-			channels.add(chann);
-			if (modes.contains("+")) chann.addModes(modes);
 		}
 	}
 
@@ -227,7 +221,6 @@ public class Bot extends PircBot {
 
 	public void addChannel(String chan) {
 		this.joinChannel(chan);
-		channels.add(new Channel(chan, this));
 		SettingsManager.addChannel(chan);
 	}
 
@@ -237,17 +230,7 @@ public class Bot extends PircBot {
 
 	public void removeChannel(String chan, String reason) {
 		partChannel(chan, reason);
-		channels.remove(chan);
 		SettingsManager.removeChannel(chan);
-	}
-
-	public Channel getChannelByName(String chan) {
-		for (Channel channel : channels) {
-			if (channel.getName().equalsIgnoreCase(chan)) {
-				return channel;
-			}
-		}
-		return null;
 	}
 
 	public PermissionHandler getPermissionHandler() {

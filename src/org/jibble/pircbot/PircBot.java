@@ -322,6 +322,7 @@ public abstract class PircBot implements ReplyConstants {
 	 */
 	public final void joinChannel(String channel) {
 		this.sendRawLine("JOIN " + channel);
+		this.setMode(channel, "");
 	}
 
 	/**
@@ -1174,7 +1175,7 @@ public abstract class PircBot implements ReplyConstants {
 			// This is the end of a NAMES list, so we know that we've got
 			// the full list of users in the channel that we just joined.
 			String channel = response.substring(response.indexOf(' ') + 1, response.indexOf(" :"));
-			User[] users = this.getUsers(channel);
+			Collection<User> users = this.getUsers(channel);
 			this.onUserList(channel, users);
 		}
 
@@ -1241,7 +1242,7 @@ public abstract class PircBot implements ReplyConstants {
 	 * 
 	 * @see User
 	 */
-	protected void onUserList(String channel, User[] users) {
+	protected void onUserList(String channel, Collection<User> users) {
 	}
 
 	/**
@@ -2277,6 +2278,14 @@ public abstract class PircBot implements ReplyConstants {
 	 * 
 	 * 
 	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
 	 * public void onIncomingFileTransfer(DccFileTransfer transfer) {
 	 * 	// Use the suggested file name.
 	 * 	File file = transfer.getFile();
@@ -2357,6 +2366,14 @@ public abstract class PircBot implements ReplyConstants {
 	 * Example:
 	 * 
 	 * <pre>
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
 	 * 
 	 * 
 	 * 
@@ -2989,22 +3006,13 @@ public abstract class PircBot implements ReplyConstants {
 	 * 
 	 * @see #onUserList(String,User[]) onUserList
 	 */
-	@SuppressWarnings("rawtypes")
-	public final User[] getUsers(String channel) {// TODO
+	public final Collection<User> getUsers(String channel) {
 		channel = channel.toLowerCase();
-		User[] userArray = new User[0];
+		Collection<User> users;
 		synchronized (_channels) {
-			Hashtable users = (Hashtable) _channels.get(channel);
-			if (users != null) {
-				userArray = new User[users.size()];
-				Enumeration enumeration = users.elements();
-				for (int i = 0; i < userArray.length; i++) {
-					User user = (User) enumeration.nextElement();
-					userArray[i] = user;
-				}
-			}
+			users = _channels.get(channel).getUsers();
 		}
-		return userArray;
+		return users;
 	}
 
 	/**
@@ -3018,17 +3026,12 @@ public abstract class PircBot implements ReplyConstants {
 	 * @return A String array containing the names of all channels that we are
 	 *         in.
 	 */
-	@SuppressWarnings("rawtypes")
-	public final String[] getChannels() {
-		String[] channels = new String[0];
-		synchronized (_channels) {
-			channels = new String[_channels.size()];
-			Enumeration enumeration = _channels.keys();
-			for (int i = 0; i < channels.length; i++) {
-				channels[i] = (String) enumeration.nextElement();
-			}
-		}
-		return channels;
+	public final HashMap<String, Channel> getChannels() {
+		return _channels;
+	}
+
+	public Channel getChannelByName(String chan) {
+		return _channels.get(chan);
 	}
 
 	/**
@@ -3059,45 +3062,40 @@ public abstract class PircBot implements ReplyConstants {
 	 * Add a user to the specified channel in our memory. Overwrite the existing
 	 * entry if it exists.
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private final void addUser(String channel, User user) {
 		channel = channel.toLowerCase();
 		synchronized (_channels) {
-			Hashtable users = (Hashtable) _channels.get(channel);
-			if (users == null) {
-				users = new Hashtable();
-				_channels.put(channel, users);
-			}
-			users.put(user, user);
+			if (_channels.get(channel) == null) _channels.put(channel, new Channel(channel));
+			Channel chan = _channels.get(channel);
+			chan.addUser(user);
 		}
 	}
 
 	/**
 	 * Remove a user from the specified channel in our memory.
 	 */
-	@SuppressWarnings("rawtypes")
 	private final User removeUser(String channel, String nick) {
 		channel = channel.toLowerCase();
 		User user = new User("", nick);
 		synchronized (_channels) {
-			Hashtable users = (Hashtable) _channels.get(channel);
-			if (users != null) {
-				return (User) users.remove(user);
-			}
+			return _channels.get(channel).removeUser(user);
 		}
-		return null;
+	}
+
+	/**
+	 * Remove a user from the specified channel in our memory.
+	 */
+	private final User removeUser(Channel channel, String nick) {
+		return this.removeUser(channel.getName(), nick);
 	}
 
 	/**
 	 * Remove a user from all channels in our memory.
 	 */
-	@SuppressWarnings("rawtypes")
 	private final void removeUser(String nick) {
 		synchronized (_channels) {
-			Enumeration enumeration = _channels.keys();
-			while (enumeration.hasMoreElements()) {
-				String channel = (String) enumeration.nextElement();
-				this.removeUser(channel, nick);
+			for (Channel chan : _channels.values()) {
+				this.removeUser(chan, nick);
 			}
 		}
 	}
@@ -3105,17 +3103,10 @@ public abstract class PircBot implements ReplyConstants {
 	/**
 	 * Rename a user if they appear in any of the channels we know about.
 	 */
-	@SuppressWarnings("rawtypes")
 	private final void renameUser(String oldNick, String newNick) {
 		synchronized (_channels) {
-			Enumeration enumeration = _channels.keys();
-			while (enumeration.hasMoreElements()) {
-				String channel = (String) enumeration.nextElement();
-				User user = this.removeUser(channel, oldNick);
-				if (user != null) {
-					user = new User(user.getPrefix(), newNick);
-					this.addUser(channel, user);
-				}
+			for (Channel chan : _channels.values()) {
+				chan.changeUserName(oldNick, newNick);
 			}
 		}
 	}
@@ -3133,58 +3124,40 @@ public abstract class PircBot implements ReplyConstants {
 	/**
 	 * Removes all channels from our memory of users.
 	 */
-	@SuppressWarnings("rawtypes")
 	private final void removeAllChannels() {
 		synchronized (_channels) {
-			_channels = new Hashtable();
+			_channels = new HashMap<String, Channel>();
 		}
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private final void updateUser(String channel, int userMode, String nick) {
 		channel = channel.toLowerCase();
 		synchronized (_channels) {
-			Hashtable users = (Hashtable) _channels.get(channel);
-			User newUser = null;
-			if (users != null) {
-				Enumeration enumeration = users.elements();
-				while (enumeration.hasMoreElements()) {
-					User userObj = (User) enumeration.nextElement();
-					if (userObj.getNick().equalsIgnoreCase(nick)) {
-						if (userMode == OP_ADD) {
-							if (userObj.hasVoice()) {
-								newUser = new User("@+", nick);
-							} else {
-								newUser = new User("@", nick);
-							}
-						} else if (userMode == OP_REMOVE) {
-							if (userObj.hasVoice()) {
-								newUser = new User("+", nick);
-							} else {
-								newUser = new User("", nick);
-							}
-						} else if (userMode == VOICE_ADD) {
-							if (userObj.isOp()) {
-								newUser = new User("@+", nick);
-							} else {
-								newUser = new User("+", nick);
-							}
-						} else if (userMode == VOICE_REMOVE) {
-							if (userObj.isOp()) {
-								newUser = new User("@", nick);
-							} else {
-								newUser = new User("", nick);
-							}
-						}
-					}
+			User user = _channels.get(channel).getUser(nick);
+			if (userMode == OP_ADD) {
+				if (user.hasVoice()) {
+					user.setPrefix("@+");
+				} else {
+					user.setPrefix("@");
 				}
-			}
-			if (newUser != null) {
-				users.put(newUser, newUser);
-			} else {
-				// just in case ...
-				newUser = new User("", nick);
-				users.put(newUser, newUser);
+			} else if (userMode == OP_REMOVE) {
+				if (user.hasVoice()) {
+					user.setPrefix("+");
+				} else {
+					user.setPrefix("");
+				}
+			} else if (userMode == VOICE_ADD) {
+				if (user.isOp()) {
+					user.setPrefix("@+");
+				} else {
+					user.setPrefix("+");
+				}
+			} else if (userMode == VOICE_REMOVE) {
+				if (user.isOp()) {
+					user.setPrefix("@");
+				} else {
+					user.setPrefix("");
+				}
 			}
 		}
 	}
@@ -3204,13 +3177,8 @@ public abstract class PircBot implements ReplyConstants {
 	private Queue _outQueue = new Queue();
 	private long _messageDelay = 1000;
 
-	// A Hashtable of channels that points to a selfreferential Hashtable of
-	// User objects (used to remember which users are in which channels).
-	@SuppressWarnings("rawtypes")
-	// TODO
-	private Hashtable _channels = new Hashtable();
-	@SuppressWarnings("unused")
-	private HashMap<String, Channel> channels = new HashMap<String, Channel>();
+	// A HashMap of channels
+	private HashMap<String, Channel> _channels = new HashMap<String, Channel>();
 
 	// A Hashtable to temporarily store channel topics when we join them
 	// until we find out who set that topic.

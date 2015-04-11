@@ -145,7 +145,7 @@ public class RegularCommands extends Plugin {
 
 		@Override
 		public void onCommand(String channel, String sender, String login, String hostname, String additional) {
-			for (String chan : bot.getChannels()) {
+			for (String chan : bot.getChannels().keySet()) {
 				bot.sendMessage(chan, additional);
 			}
 		}

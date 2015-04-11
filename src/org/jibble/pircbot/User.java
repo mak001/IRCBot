@@ -13,7 +13,6 @@
 package org.jibble.pircbot;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This class is used to represent a user on an IRC server.
@@ -30,7 +29,6 @@ import java.util.List;
  */
 public class User {
 
-	private List<String> permissions;
 	private String _prefix;
 	private String _nick;
 	private String _lowerNick;
@@ -45,17 +43,14 @@ public class User {
 	 * @param nick
 	 *            The nick of the user.
 	 */
-	User(String prefix, String nick) {
-		this(prefix, nick, null);
+	User(String nick) {
+		this("", nick);
 	}
 
-	public User(String prefix, String nick, List<String> permissions) {
-		if (permissions == null) permissions = new ArrayList<String>();
+	public User(String prefix, String nick) {
 		_prefix = prefix;
 		_nick = nick;
 		_lowerNick = nick.toLowerCase();
-		this.permissions = permissions;
-		// TODO
 	}
 
 
@@ -69,6 +64,10 @@ public class User {
 	 */
 	public String getPrefix() {
 		return _prefix;
+	}
+
+	public void setPrefix(String prefix) {
+		_prefix = prefix;
 	}
 
 
@@ -204,18 +203,6 @@ public class User {
 			return other._lowerNick.compareTo(_lowerNick);
 		}
 		return -1;
-	}
-
-	public List<String> getPermissions() {
-		return permissions;
-	}
-
-	public void addPermission(String permission) {
-		permissions.add(permission);
-	}
-
-	public void removePermission(String permission) {
-		permissions.remove(permission);
 	}
 
 	public enum Modes
