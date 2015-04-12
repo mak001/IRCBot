@@ -322,6 +322,7 @@ public abstract class PircBot implements ReplyConstants {
 	 */
 	public final void joinChannel(String channel) {
 		this.sendRawLine("JOIN " + channel);
+		addChannel(channel);
 		this.setMode(channel, "");
 	}
 
@@ -345,6 +346,7 @@ public abstract class PircBot implements ReplyConstants {
 	 */
 	public final void partChannel(String channel) {
 		this.sendRawLine("PART " + channel);
+		removeChannel(channel);
 	}
 
 	/**
@@ -357,6 +359,7 @@ public abstract class PircBot implements ReplyConstants {
 	 */
 	public final void partChannel(String channel, String reason) {
 		this.sendRawLine("PART " + channel + " :" + reason);
+		removeChannel(channel);
 	}
 
 	/**
@@ -1511,7 +1514,8 @@ public abstract class PircBot implements ReplyConstants {
 	 */
 	private final void processMode(String target, String sourceNick, String sourceLogin, String sourceHostname,
 			String mode) {
-
+		System.out.println(target + " --- " + sourceNick + " --- " + sourceLogin + " --- " + sourceHostname + " --- "
+				+ mode);
 		if (_channelPrefixes.indexOf(target.charAt(0)) >= 0) {
 			// The mode of a channel is being changed.
 			String channel = target;
@@ -2286,6 +2290,13 @@ public abstract class PircBot implements ReplyConstants {
 	 * 
 	 * 
 	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
 	 * public void onIncomingFileTransfer(DccFileTransfer transfer) {
 	 * 	// Use the suggested file name.
 	 * 	File file = transfer.getFile();
@@ -2366,6 +2377,13 @@ public abstract class PircBot implements ReplyConstants {
 	 * Example:
 	 * 
 	 * <pre>
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
 	 * 
 	 * 
 	 * 
@@ -3108,6 +3126,12 @@ public abstract class PircBot implements ReplyConstants {
 			for (Channel chan : _channels.values()) {
 				chan.changeUserName(oldNick, newNick);
 			}
+		}
+	}
+
+	private final void addChannel(String channel) {
+		synchronized (_channels) {
+			if (_channels.containsKey(channel)) _channels.put(channel, new Channel(channel));
 		}
 	}
 

@@ -32,7 +32,7 @@ public class Channel {
 	}
 
 	public User removeUserByName(String nick) {
-		return _users.remove(nick) ;
+		return _users.remove(nick);
 	}
 
 	public User removeUser(User user) {
@@ -40,11 +40,11 @@ public class Channel {
 	}
 
 	public User addUserByName(String nick) {
-		return _users.put(nick, new User(nick)) ;
+		return _users.put(nick, new User(nick));
 	}
 
 	public User addUserByName(String prefix, String nick) {
-		return _users.put(nick, new User(prefix, nick)) ;
+		return _users.put(nick, new User(prefix, nick));
 	}
 
 	public User addUser(User user) {
@@ -54,8 +54,8 @@ public class Channel {
 	public Collection<User> getUsers() {
 		return _users.values();
 	}
-	
-	public HashMap<String, User> getUserMap(){
+
+	public HashMap<String, User> getUserMap() {
 		return _users;
 	}
 
@@ -84,8 +84,9 @@ public class Channel {
 		System.out.println(mode);
 		char[] ms = mode.toCharArray();
 		for (char m : ms) {
-			if (m != '+') {
+			if (!Character.isWhitespace(m) && m != '+' && m != ' ' && !hasMode(m)) {
 				modes.add(getMode(m));
+				System.out.println("Adding mode " + m + " to channel " + name);
 			}
 		}
 	}

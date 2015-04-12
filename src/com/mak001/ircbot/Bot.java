@@ -121,6 +121,14 @@ public class Bot extends PircBot {
 	public void onMode(String channel, String sourceNick, String sourceLogin, String sourceHostname, String mode) {
 		Channel chan = getChannelByName(channel);
 		if (chan != null) {
+			if (mode.contains(" ")) {
+				String[] ms = mode.split(" ");
+				for (String m : ms) {
+					if (m.contains("+") || m.contains("-")) {
+						mode = m;
+					}
+				}
+			}
 			if (mode.contains("-")) {
 				chan.removeModes(mode);
 			} else if (mode.contains("+")) {
