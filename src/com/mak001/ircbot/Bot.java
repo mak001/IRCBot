@@ -66,7 +66,7 @@ public class Bot extends PircBot {
 	@Override
 	public void onMessage(String channel, String sender, String login, String hostname, String message) {
 		if (isCommand(message)) {
-			String s = message.replace(SettingsManager.getCommandPrefix(), "");
+			String s = message.replaceFirst(SettingsManager.getCommandPrefix(), "");
 			manager.onCommand(channel, sender, login, hostname, s);
 		} else {
 			manager.triggerMessageListeners(channel, sender, login, hostname, message);
@@ -76,7 +76,7 @@ public class Bot extends PircBot {
 	@Override
 	public void onPrivateMessage(String sender, String login, String hostname, String message) {
 		if (isCommand(message)) {
-			String s = message.replace(SettingsManager.getCommandPrefix(), "");
+			String s = message.replaceFirst(SettingsManager.getCommandPrefix(), "");
 			manager.onCommand(sender, sender, login, hostname, s);
 		} else {
 			manager.triggerPrivateMessageListeners(sender, login, hostname, message);
