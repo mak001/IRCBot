@@ -16,23 +16,30 @@ public class Boot {
 
 	private static Bot bot;
 	private static GUI gui;
-
 	private static SimpleGUI simpleGUI;
+	private static RootCommands rc;
+
+	private final static String NO_GUI = "nogui";
+	private final static String SIMPLE_GUI = "simpleGUI";
+	private final static String FULL_GUI = "fullGUI";
 
 	public static void main(String[] argsList) throws Exception {
 		SettingsManager.load();
 		List<String> args = Arrays.asList(argsList);
 
-		if (!args.contains("-gui") && !args.contains("simpleGUI")) {
-			System.out.println("loading GUI");
-			gui = new GUI();
-			gui.setVisible(true);
-			redirectSystemStreams("-gui");
-		} else if (args.contains("simpleGUI")) {
+		if (args.contains(NO_GUI)) {
+			rc = new RootCommands();
+			rc.start();
+		} else if (args.contains(SIMPLE_GUI)) {
 			System.out.println("loading simple GUI");
 			simpleGUI = new SimpleGUI();
 			simpleGUI.setVisible(true);
-			redirectSystemStreams("simpleGUI");
+			redirectSystemStreams(SIMPLE_GUI);
+		} else {
+			System.out.println("loading GUI");
+			gui = new GUI();
+			gui.setVisible(true);
+			redirectSystemStreams(FULL_GUI);
 		}
 		setUp();
 
@@ -72,7 +79,7 @@ public class Boot {
 	}
 
 	private static void redirectSystemStreams(String arg) {
-		if (arg.equals("simpleGUI")) {
+		if (arg.equals(SIMPLE_GUI)) {
 			OutputStream out = new OutputStream() {
 
 				@Override
@@ -94,7 +101,7 @@ public class Boot {
 			System.setOut(new PrintStream(out, true));
 			System.setErr(new PrintStream(out, true));
 
-		} else if (arg.equals("-gui")) { // TODO
+		} else if (arg.equals(FULL_GUI)) { // TODO
 
 			OutputStream out = new OutputStream() {
 
@@ -126,5 +133,6 @@ public class Boot {
 		if (simpleGUI != null) {
 			simpleGUI.dispose();
 		}
+		rc.kill();
 	}
 }
