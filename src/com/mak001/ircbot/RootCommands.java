@@ -8,7 +8,7 @@ import java.io.InputStreamReader;
 
 public class RootCommands extends Thread implements Runnable {
 
-	private final String[] EXIT = new String[] { "EXIT", "STOP" };
+	private final String[] EXIT = new String[] { "EXIT", "STOP", "SHUTDOWN" };
 
 	private boolean running = true;
 	private final Console console;
@@ -38,16 +38,26 @@ public class RootCommands extends Thread implements Runnable {
 			} else {
 				line = console.readLine();
 			}
-
-			// TODO Auto-generated method stub
-			if (equalsIgnoreCase(line, EXIT)) {
-				Boot.getBot().shutDown("Bot Console");
-			}
+			processCommandLineCommand(line);
 		}
 	}
 
 	public void kill() {
 		running = false;
+		try {
+			br.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void processCommandLineCommand(String command) {
+		// TODO Auto-generated method stub
+		if (equalsIgnoreCase(command, EXIT)) {
+			Boot.getBot().shutDown("Bot Console");
+		} else {
+			System.out.println(command + " is not a valid console commmand.");
+		}
 	}
 
 	private boolean equalsIgnoreCase(String base, String[] compare) {

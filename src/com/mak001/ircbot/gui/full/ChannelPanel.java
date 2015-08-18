@@ -1,4 +1,4 @@
-package com.mak001.ircbot.gui;
+package com.mak001.ircbot.gui.full;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

@@ -6,7 +6,7 @@ import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.List;
 
-import com.mak001.ircbot.gui.GUI;
+import com.mak001.ircbot.gui.full.GUI;
 import com.mak001.ircbot.gui.simple.SimpleGUI;
 
 public class Boot {
@@ -27,8 +27,8 @@ public class Boot {
 		SettingsManager.load();
 		List<String> args = Arrays.asList(argsList);
 
+		rc = new RootCommands();
 		if (args.contains(NO_GUI)) {
-			rc = new RootCommands();
 			rc.start();
 		} else if (args.contains(SIMPLE_GUI)) {
 			System.out.println("loading simple GUI");
@@ -49,7 +49,7 @@ public class Boot {
 		bot = new Bot();
 
 		// Enable debugging output.
-		bot.setVerbose(true);
+		// TODO - bot.setVerbose(true);
 
 		// Connect to the IRC server.
 		System.out.println("Connecting to " + SERVER);
@@ -134,5 +134,9 @@ public class Boot {
 			simpleGUI.dispose();
 		}
 		rc.kill();
+	}
+
+	public static RootCommands getConsoleCommands() {
+		return rc;
 	}
 }
