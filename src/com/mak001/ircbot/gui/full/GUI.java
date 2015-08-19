@@ -1,33 +1,39 @@
 package com.mak001.ircbot.gui.full;
 
-import java.awt.BorderLayout;
-
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.JEditorPane;
-import javax.swing.JFrame;
-import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
-import com.mak001.ircbot.gui.LimitLinesDocumentListener;
+import com.mak001.ircbot.gui.CustomFrame;
+import com.mak001.ircbot.gui.InputPanel;
 
-@SuppressWarnings("serial")
-public class GUI extends JFrame {
+public class GUI extends CustomFrame {
 
+	private static final long serialVersionUID = -196642858509025009L;
 	JEditorPane editorPane = new JEditorPane();
-	private final int LINE_LIMIT = 100;
 	Document doc;
 
 	public GUI() {
 		doc = editorPane.getDocument();
-		doc.addDocumentListener(new LimitLinesDocumentListener(LINE_LIMIT));
-		setTitle("ircBot output");
+		doc.addDocumentListener(lineLimiter);
 		setSize(700, 347);
-
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		getContentPane().add(tabbedPane, BorderLayout.CENTER);
+		
+		InputPanel panel = new InputPanel();
+		GroupLayout groupLayout = new GroupLayout(getContentPane());
+		groupLayout.setHorizontalGroup(
+			groupLayout.createParallelGroup(Alignment.LEADING)
+				.addComponent(panel, GroupLayout.DEFAULT_SIZE, 684, Short.MAX_VALUE)
+		);
+		groupLayout.setVerticalGroup(
+			groupLayout.createParallelGroup(Alignment.LEADING)
+				.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
+					.addContainerGap(248, Short.MAX_VALUE)
+					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 39, GroupLayout.PREFERRED_SIZE))
+		);
+		getContentPane().setLayout(groupLayout);
 
 	}
 
